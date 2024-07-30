@@ -2,7 +2,7 @@
   <div>
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
       <el-tab-pane label="逻辑编辑" name="blockly" />
-      <el-tab-pane label="代码查看" name="script" />
+      <el-tab-pane label="代码查看！" name="script" />
     </el-tabs>
     <div
       v-show="activeName === 'blockly'"

@@ -76,7 +76,7 @@ export function getVerses(
   sort = '-created_at',
   search = '',
   page = 0,
-  expand = 'image,author,share'
+  expand = 'image,author,share',
 ) {
   let query = []
   query['expand'] = expand

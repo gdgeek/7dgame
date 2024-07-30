@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <el-dialog
       :visible.sync="dialogVisible"
       width="95%"
@@ -53,8 +52,9 @@
               </el-card>
             </div>
             <div class="clearfix">
-
-              <el-button size="mini" @click="selected({ data:item })">选择</el-button>
+              <el-button size="mini" @click="selected({ data: item })">
+                选择
+              </el-button>
             </div>
             <div class="bottom clearfix" />
           </el-card>
@@ -98,7 +98,7 @@ import { Waterfall, WaterfallItem } from 'vue2-waterfall'
 
 import { v4 as uuidv4 } from 'uuid'
 
-import { getVerses} from '@/api/v1/verse'
+import { getVerses } from '@/api/v1/vp-guide'
 
 import MrPPHeader from '@/components/MrPP/MrPPHeader'
 export default {
@@ -110,10 +110,9 @@ export default {
   },
   data() {
     return {
-      
       verse_id: -1,
       value: null,
-     
+
       active: {
         items: null,
         sorted: '-created_at',
@@ -150,15 +149,14 @@ export default {
       return 'title'
     },
     open() {
-    
       this.active = {
         items: null,
         sorted: '-created_at',
         searched: '',
         pagination: { current: 1, count: 1, size: 20, total: 20 }
       }
-     // this.verse_id = verse_id
-     // this.value = value
+      // this.verse_id = verse_id
+      // this.value = value
       this.refresh()
       this.dialogVisible = true
     },
@@ -176,7 +174,6 @@ export default {
       this.dialogVisible = false
     },
     sort: function (value) {
-      
       this.active.sorted = value
       this.refresh()
     },
@@ -197,16 +194,16 @@ export default {
       this.$emit('selected', data)
       this.dialogVisible = false
     },
-   
+
     async create() {
-      const name = await this.input('请输入元数据名称');
+      const name = await this.input('请输入元数据名称')
 
       postMeta({
-        title: name? name: '新建元数据',
+        title: name ? name : '新建元数据',
         prefab: 0,
         uuid: uuidv4()
       }).then(async response => {
-        this.selected({data: response.data})
+        this.selected({ data: response.data })
         this.dialogVisible = false
       })
     },
@@ -216,7 +213,7 @@ export default {
     handleCurrentChange: function (page) {
       this.active.pagination.current = page
       this.refresh()
-    },
+    }
   }
 }
 </script>

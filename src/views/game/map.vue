@@ -10,18 +10,35 @@
           sortByName="title"
           :hasSearch="false"
         >
+          <el-tag type="success" v-if="data">第{{ data.page + 1 }}地图</el-tag>
+          &nbsp;
           <el-button-group :inline="true">
             <el-button size="mini" type="primary" @click="addGuide()">
               <font-awesome-icon icon="plus" />
               &nbsp;
-              <span class="hidden-sm-and-down">创建【关卡】</span>
+              <span class="hidden-sm-and-down">增加关卡</span>
+            </el-button>
+            <el-button size="mini" type="primary" @click="addMap()">
+              <font-awesome-icon icon="plus" />
+              &nbsp;
+              <span class="hidden-sm-and-down">增加地图</span>
+            </el-button>
+            <el-button
+              size="mini"
+              v-if="pagination.current === pagination.count"
+              type="primary"
+              @click="removeMap()"
+            >
+              <font-awesome-icon icon="trash" />
+              &nbsp;
+              <span class="hidden-sm-and-down">减少地图</span>
             </el-button>
           </el-button-group>
         </mr-p-p-header>
       </el-header>
       <el-main>
         <el-card>
-          <el-table :data="items" style="width: 100%">
+          <el-table v-if="data" :data="data.guides" style="width: 100%">
             <el-table-column prop="order" label="顺序" width="180">
               <template slot-scope="scope">
                 <el-input
@@ -73,15 +90,13 @@
 
 <script>
 import MrPPHeader from '@/components/MrPP/MrPPHeader'
-import {
-  putVpGuide,
-  getVpGuides,
-  postVpGuide,
-  deleteVpGuide
-} from '@/api/v1/vp-guide.js'
+
+import { getVpMaps, postVpMap, deleteVpMap } from '@/api/v1/vp-map'
+import { putVpGuide, postVpGuide, deleteVpGuide } from '@/api/v1/vp-guide.js'
 import VerseDialog from '@/components/MrPP/VerseDialog.vue'
 export default {
-  name: 'GameIndex',
+  name: 'GameMap',
+
   components: {
     VerseDialog,
     MrPPHeader
@@ -112,13 +127,69 @@ export default {
       }
     },
     selected(item) {
-      postVpGuide({ level_id: item.data.id }).then(res => {
+      postVpGuide({ level_id: item.data.id, map_id: this.data.id }).then(
+        res => {
+          this.$message({
+            type: 'success',
+            message: '添加成功!'
+          })
+          this.refresh()
+        }
+      )
+    },
+    async removeMap() {
+      try {
+        await this.$confirm(
+          '删除地图(' + this.pagination.count + ')?',
+          '提示',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        )
+        await deleteVpMap(this.data.id)
+
+        await this.refresh()
+        this.pagination.current = this.pagination.count
         this.$message({
           type: 'success',
-          message: '添加成功!'
+          message: '删除成功!'
+        })
+      } catch (e) {
+        console.error(e)
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      }
+    },
+    async addMap() {
+      try {
+        await this.$confirm(
+          '创建地图(' + (this.pagination.count + 1) + ')?',
+          '提示',
+          {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }
+        )
+        const r = await postVpMap({ page: this.pagination.count })
+        this.pagination.count = this.pagination.count + 1
+        this.pagination.current = this.pagination.count + 1
+        this.$message({
+          type: 'success',
+          message: '创建成功!'
         })
         this.refresh()
-      })
+      } catch (e) {
+        console.error(e)
+        this.$message({
+          type: 'info',
+          message: '已取消创建'
+        })
+      }
     },
     addGuide() {
       this.$refs.dialog.open()
@@ -145,13 +216,13 @@ export default {
       }
     },
     async refresh() {
-      const response = await getVpGuides(this.pagination.current)
-      this.items = response.data
+      const r = await getVpMaps(this.pagination.current)
+      this.data = r.data[0]
       this.pagination = {
-        current: parseInt(response.headers['x-pagination-current-page']),
-        count: parseInt(response.headers['x-pagination-page-count']),
-        size: parseInt(response.headers['x-pagination-per-page']),
-        total: parseInt(response.headers['x-pagination-total-count'])
+        current: parseInt(r.headers['x-pagination-current-page']),
+        count: parseInt(r.headers['x-pagination-page-count']),
+        size: parseInt(r.headers['x-pagination-per-page']),
+        total: parseInt(r.headers['x-pagination-total-count'])
       }
     },
     handleCurrentChange(val) {
@@ -162,8 +233,8 @@ export default {
 
   data() {
     return {
-      items: null,
-      pagination: { current: 1, count: 1, size: 20, total: 20 }
+      data: null,
+      pagination: { current: 1, count: 1, size: 1, total: 1 }
     }
   }
 }

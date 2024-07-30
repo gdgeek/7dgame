@@ -11,6 +11,28 @@ export function postVpGuide(data) {
 }
 
 
+export function getVerses(
+  sort = '-created_at',
+  search = '',
+  page = 0,
+  expand = 'image,author,share',
+) {
+  let query = []
+  query['expand'] = expand
+  query['sort'] = sort
+
+  if (search !== '') {
+    query['VerseSearch[name]'] = search
+  }
+  if (page > 1) {
+    query['page'] = page
+  }
+
+  return request({
+    url: path.join('v1', 'vp-guides', 'verses' + qs.stringify(query, true)),
+    method: 'get'
+  })
+}
 export function getVpGuide(id) {
   return request({
     url: 'v1/vp-guides/' + id,
