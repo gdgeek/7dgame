@@ -434,12 +434,6 @@ export const constantRoutes = [
         component: Empty,
         children: [
           {
-            path: 'index',
-            name: 'GameIndex',
-            meta: { title: '游戏配置' },
-            component: () => import('@/views/game/index')
-          },
-          {
             path: 'map',
             name: 'GameMap',
             meta: { title: '地图配置' },

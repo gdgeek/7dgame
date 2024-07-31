@@ -186,11 +186,6 @@ const state = {
       icon: 'gamepad',
       items: [
         {
-          label: '游戏配置',
-          url: '/game/index',
-          icon: 'gamepad'
-        },
-        {
           label: '地图配置',
           url: '/game/map',
           icon: 'map'
