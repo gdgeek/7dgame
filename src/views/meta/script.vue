@@ -4,9 +4,6 @@
       <el-main>
         <el-card v-loading="loading" class="box-card">
           <div slot="header" class="clearfix">
-            
-            
-
             <el-button-group style="float: right">
               <el-button
                 v-if="saveable"
@@ -102,7 +99,7 @@ export default {
         },
         {
           path: '/meta/index',
-          meta: { title: '元数据【'+this.meta.title+'】' }
+          meta: { title: '元数据【' + this.meta.title + '】' }
         },
         {
           path:

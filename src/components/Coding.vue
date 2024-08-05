@@ -57,12 +57,12 @@ export default {
   },
 
   mounted() {
-    if (this.meta.data) {
-      AddBlocks({
-        index: this.index,
-        resource: this.getResource(this.meta)
-      })
-    }
+    console.error(this.meta)
+
+    AddBlocks({
+      index: this.index,
+      resource: this.getResource(this.meta)
+    })
 
     this.workspace = Blockly.inject('blocklyDiv', {
       media: 'resource/blockly/media/',
@@ -93,8 +93,6 @@ export default {
   },
   methods: {
     getResource(meta) {
-      const data = JSON.parse(meta.data)
-
       const ret = {
         action: [],
         trigger: [],
@@ -107,20 +105,24 @@ export default {
         entity: [],
         events: {
           inputs: [],
-          outputs: [],
-        },
+          outputs: []
+        }
       }
       ret.events = JSON.parse(meta.events)
-      if(!ret.events) {
+      if (!ret.events) {
         ret.events = {}
       }
-      if(!ret.events.inputs) {
+      if (!ret.events.inputs) {
         ret.events.inputs = []
       }
-      if(!ret.events.outputs) {
+      if (!ret.events.outputs) {
         ret.events.outputs = []
       }
-      this.addMetaData(data, ret)
+
+      if (meta.data) {
+        const data = JSON.parse(meta.data)
+        this.addMetaData(data, ret)
+      }
       return ret
     },
     addMetaData(data, ret) {
@@ -137,7 +139,7 @@ export default {
         'video',
         'picture',
         'text',
-        'voxel',
+        'voxel'
       ])
 
       if (entity) {
@@ -173,7 +175,7 @@ export default {
         ret.text.push(text)
       }
       const voxel = self.testPoint(data, ['voxel'])
-    
+
       if (voxel) {
         ret.voxel.push(voxel)
       }
@@ -220,7 +222,8 @@ export default {
     handleClick(tab, event) {
       if (this.activeName === 'script') {
         this.script =
-          'local meta = {}\nlocal index = \'\'\n' + Blockly.Lua.workspaceToCode(this.workspace)
+          "local meta = {}\nlocal index = ''\n" +
+          Blockly.Lua.workspaceToCode(this.workspace)
       }
       console.log(tab, event)
     },
@@ -234,7 +237,8 @@ export default {
 
       try {
         const script =
-           'local meta = {}\nlocal index = \'\'\n' + Blockly.Lua.workspaceToCode(this.workspace)
+          "local meta = {}\nlocal index = ''\n" +
+          Blockly.Lua.workspaceToCode(this.workspace)
 
         const response = await putCyber(this.cyber.id, {
           data: JSON.stringify(data),

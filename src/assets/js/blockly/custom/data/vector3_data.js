@@ -3,6 +3,7 @@ import DataType from './type'
 const data = {
   name: 'vector3_data'
 }
+
 const block = {
   title: data.name,
   type: DataType.name,
