@@ -293,7 +293,7 @@ export default {
       const response = await postFile(data)
       this.updateVoxel(response.data.id, info)
     },
-    
+
     loaded: async function (info) {
       const self = this
       const store = this.store
@@ -328,7 +328,7 @@ export default {
 
       await self.saveFile(md5, file.extension, info, file, handler)
     },
-    
+
     screenshot: function () {
       return this.$refs.three.screenshot()
     }

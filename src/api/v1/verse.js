@@ -25,6 +25,13 @@ export function getVerse(id, expand = 'metas,share') {
     method: 'get'
   })
 }
+export function putVerseCode(id, data) {
+  return request({
+    url: path.join('v1', 'verses', 'code' + qs.stringify({ id }, true)),
+    method: 'put',
+    data
+  })
+}
 
 export function getVersesWithShare(
   sort = '-created_at',

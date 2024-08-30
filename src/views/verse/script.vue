@@ -4,8 +4,6 @@
       <el-main>
         <el-card v-loading="loading" class="box-card">
           <div v-if="script && verse" slot="header" class="clearfix">
-          
-
             <el-button-group style="float: right">
               <el-button
                 v-if="saveable"
@@ -35,7 +33,11 @@
 <script>
 import BlocklyScript from '@/components/Script.vue'
 import { mapMutations } from 'vuex'
-import { getVerseScript, postVerseScript, putVerseScript } from '@/api/v1/verse-script'
+import {
+  getVerseScript,
+  postVerseScript,
+  putVerseScript
+} from '@/api/v1/verse-script'
 
 import { v4 as uuidv4 } from 'uuid'
 import { AbilityEditable } from '@/ability/ability'
@@ -62,13 +64,13 @@ export default {
     resource() {
       const inputs = []
       const outputs = []
-      this.verse.metas.forEach(meta => { 
-        let events = JSON.parse(meta.events);
+      this.verse.metas.forEach(meta => {
+        let events = JSON.parse(meta.events)
         if (!events) {
-          events = {inputs: [], outputs: []}
+          events = { inputs: [], outputs: [] }
         }
         events.inputs.forEach(input => {
-          const data = this.map.get(meta.id);
+          const data = this.map.get(meta.id)
           inputs.push({
             title: data.title + ':' + input.title,
             index: data.uuid,
@@ -77,24 +79,21 @@ export default {
         })
 
         events.outputs.forEach(input => {
-          const data = this.map.get(meta.id);
+          const data = this.map.get(meta.id)
           outputs.push({
             title: data.title + ':' + input.title,
             index: data.uuid,
             uuid: input.uuid
           })
         })
-
       })
 
-   
       return {
-        events: { 
+        events: {
           inputs,
-          outputs,
+          outputs
         }
       }
-     
     },
     saveable() {
       if (this.script === null) {
@@ -131,29 +130,23 @@ export default {
     */
     this.loading = false
 
-    const response = await getVerse(
-      this.id,
-      'metas, module, share, script'
-    )
+    const response = await getVerse(this.id, 'metas, module, share, script')
 
-    
     console.log(response.data)
     this.verse = response.data
     if (!this.verse.script) {
-      const  vresponse = await postVerseScript({
+      const vresponse = await postVerseScript({
         verse_id: this.id,
-        title:"script",
+        title: 'script',
         uuid: uuidv4()
-      });
+      })
       alert(JSON.stringify(vresponse.data))
 
       this.script = vresponse.data
-
-      
     } else {
       this.script = this.verse.script
     }
-    
+
     const data = JSON.parse(this.verse.data)
     /*data.children.metas.forEach(meta => {
       this.titles.set(meta.parameters.uuid, meta.parameters.title)
@@ -161,7 +154,10 @@ export default {
 
     this.map = new Map()
     data.children.modules.forEach(module => {
-      this.map.set(module.parameters.meta_id, {uuid:module.parameters.uuid, title: module.parameters.title} )
+      this.map.set(module.parameters.meta_id, {
+        uuid: module.parameters.uuid,
+        title: module.parameters.title
+      })
     })
 
     this.setBreadcrumbs({
@@ -180,7 +176,7 @@ export default {
         },
         {
           path: '.',
-          meta: { title:   '脚本编辑' }
+          meta: { title: '脚本编辑' }
         }
       ]
     })
