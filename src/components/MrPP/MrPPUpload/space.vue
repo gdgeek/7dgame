@@ -24,14 +24,14 @@
 
 <script>
 import path from 'path'
-
-import { postFile } from '@/api/files'
+import { postFile } from '@/api/v1/files'
 import { postSpace } from '@/api/v1/space'
 
-import cloud from '@/assets/js/file/tencent-cloud.js'
+import { mapState } from 'vuex'
 
 export default {
-  name: 'MrPPUpload',
+  name: 'SpaceUpload',
+
   props: {
     fileType: {
       type: String,
@@ -86,6 +86,11 @@ export default {
       isdisabled: false
     }
   },
+  computed: {
+    ...mapState({
+      store: state => state.config.store
+    })
+  },
   methods: {
     step(idx) {
       const item = this.data[idx]
@@ -99,17 +104,16 @@ export default {
       } else {
         this.data[idx].status = ''
       }
-
       this.data[idx].percentage = Math.round(Math.min(p, 1) * 100)
     },
-    async postFile(info, data, name, handler) {
+    async addFile(data, name) {
       return new Promise(async function (resolve, reject) {
         try {
           const file = await postFile({
             md5: data.md5,
             key: data.md5 + data.ext,
             filename: name,
-            url: cloud.getUrl(info, data, handler)
+            url: data.url
           })
           resolve(file.data)
         } catch (err) {
@@ -117,91 +121,129 @@ export default {
         }
       })
     },
+    filterInfo(data) {
+      return data
+    },
     async save(info, progress, handler) {
       const self = this
+
       console.error(info)
       return new Promise(async function (resolve, reject) {
         try {
-          const authoring_glb_data = await self.postFile(
-            info,
-            info.authoring_glb,
-            info.name + '_authoring.glb',
-            handler
-          )
-          progress(0.25)
-
-          const occlusion_glb_data = await self.postFile(
-            info,
+          const occlusion_glb_data = await self.addFile(
             info.occlusion_glb,
             info.name + '_occlusion.glb',
             handler
           )
 
-          progress(0.5)
+          progress(0.25)
 
-          //const navmesh_data = await postFile(info, info.navmesh, handler)
-          const dat_data = await self.postFile(
-            info,
+          const dat_data = await self.addFile(
             info.dat,
             info.name + '_dat.dat',
             handler
           )
-          progress(0.75)
+          progress(0.5)
 
-          const data = {
-            title: info.name,
-            name: info.name,
-            sample_id: occlusion_glb_data.id,
-            mesh_id: authoring_glb_data.id,
-            dat_id: dat_data.id,
-            info: JSON.stringify(info)
+          if (
+            info.authoring_glb !== 'undefined' &&
+            info.authoring_glb !== undefined
+          ) {
+            const authoring_glb_data = await self.addFile(
+              info.authoring_glb,
+              info.name + '_authoring.glb',
+              handler
+            )
+            progress(0.75)
+            const data = {
+              title: info.name,
+              name: info.name,
+              sample_id: occlusion_glb_data.id,
+              mesh_id: authoring_glb_data.id,
+              dat_id: dat_data.id,
+              info: JSON.stringify(info)
+            }
+
+            const space = await postSpace(data)
+            progress(1)
+            resolve(space)
+          } else {
+            progress(0.75)
+            const data = {
+              title: info.name,
+              name: info.name,
+              sample_id: occlusion_glb_data.id,
+              mesh_id: occlusion_glb_data.id,
+              dat_id: dat_data.id,
+              info: JSON.stringify(info)
+            }
+
+            const space = await postSpace(data)
+            progress(1)
+            resolve(space)
           }
-
-          const space = await postSpace(data)
-
-          progress(1)
-          resolve(space)
         } catch (err) {
           reject(err)
         }
       })
     },
     async upload(md5, file, handler) {
+
+      console.error(1)
+      console.error(this.store)
+      
+      console.error(2)
+     // const pubHandler = await store.publicHandler()
+      const priHandler = handler
+
+      console.error(3)
       const self = this
+      console.error(2)
       return new Promise(async function (resolve, reject) {
         try {
-          const store = cloud
-          let has = await store.fileHas(md5, file.extension, handler, 'upload')
-          if (has === null) {
-            const r = await store.fileUpload(
+
+          console.error(3)
+          const store = self.store
+          const has = await store.fileHas(
+            md5,
+            file.extension,
+            priHandler,
+            'upload'
+          )
+
+          console.error(4)
+          if (!has) {
+            await store.fileUpload(
               md5,
               file.extension,
               file,
               function (p) {
                 self.progress(p, 1)
               },
-              handler,
+              priHandler,
               'upload'
             )
           }
-          self.progress(1, 1)
 
-          const json = await store.fileProcess(
+          console.error(4)
+          self.progress(1, 1)
+          const data = await store.fileProcess(
             'info',
             '.json',
             function (p) {
               self.progress(p, 2)
             },
-            handler,
+            priHandler,
             path.join('release', md5),
             60000
           )
 
-          if (json === null) {
+          console.error(5)
+          if (data === null) {
             throw 'No Info File'
           }
-          const info = JSON.parse(json)
-          resolve(info)
+
+          resolve(data)
         } catch (err) {
           reject(err)
         }
@@ -211,56 +253,49 @@ export default {
       const self = this
       return new Promise(async function (resolve, reject) {
         try {
-          const store = cloud
+          const store = self.store
           const file = await store.fileOpen(self.fileType)
 
           self.isdisabled = false
           const md5 = await store.fileMD5(file, function (p) {
             self.progress(p, 0)
           })
-          const handler = await store.rawHandler()
-          let info = null
-          let hasJson = await store.fileHas(
+
+          const priHandler = await store.privateHandler()
+         
+          const has = await store.fileHas(
             'info',
             '.json',
-            handler,
+            priHandler,
             path.join('release', md5)
           )
-          if (hasJson !== null) {
-            let json = await store.fileDownload(
+          let data = null
+
+          if (has) {
+            data = await store.fileDownload(
               'info',
               '.json',
-              function (p) {
-                self.progress(p, 1)
-              },
-              handler,
+              function (p) {},
+              priHandler,
               path.join('release', md5)
             )
-            if (json === null) {
-              throw 'No Info File'
-            } else {
-              info = JSON.parse(json)
-              self.progress(1, 1)
-              self.progress(1, 2)
-            }
+            self.progress(1, 1)
+            self.progress(1, 2)
+          } else {
+            data = await self.upload(md5, file, priHandler)
           }
-          if (info === null) {
-            info = await self.upload(md5, file, handler)
-          }
-
-          if (info.status !== 'success') {
+          data = self.filterInfo(data)
+          if (data.status !== 'success') {
             throw 'Info File Not Success'
           }
           const response = await self.save(
-            info,
+            data,
             function (p) {
               self.progress(p, 3)
             },
-            handler
+            priHandler
           )
-          if (response.data === null) {
-            throw 'No Space!'
-          }
+
           self.progress(1, 3)
           self.$router.push({
             path: '/space/view',
@@ -268,7 +303,6 @@ export default {
           })
           resolve()
         } catch (err) {
-          //    alert(err)
           reject(err)
         }
       })

@@ -17,49 +17,27 @@ const state = {
       ]
     },
     {
-      label: '元&宇宙',
-      url: '/verse/',
-      icon: 'adjust',
-      items: [
-        {
-          label: '自己创造',
-          url: '/meta-verse/index',
-          icon: 'list'
-        },
-        {
-          label: '系统推荐',
-          url: '/meta-verse/open',
-          icon: 'list'
-        },
-        {
-          label: '朋友分享',
-          url: '/meta-verse/share',
-          icon: 'list'
-        }
-      ]
-    },
-    {
-      label: '场景',
-      url: '/space/',
-      icon: 'home',
-      items: [
-        {
-          label: '场景列表',
-          url: '/space/index/',
-          icon: 'list'
-        },
-        {
-          label: '场景上传',
-          url: '/space/upload/',
-          icon: 'upload'
-        }
-      ]
-    },
-    {
       label: '资源管理',
       url: '/resource/',
       icon: 'cubes',
       items: [
+        {
+          label: '体素管理',
+          url: '/voxel/',
+          icon: 'cubes',
+          items: [
+            {
+              label: '体素列表',
+              url: '/voxel/index',
+              icon: 'list'
+            },
+            {
+              label: '体素上传',
+              url: '/voxel/upload',
+              icon: 'upload'
+            }
+          ]
+        },
         {
           label: '模型管理',
           url: '/polygen/',
@@ -73,12 +51,6 @@ const state = {
             {
               label: '模型上传',
               url: '/polygen/upload',
-              icon: 'upload'
-            },
-            {
-              label: '模型上传(高级)',
-              hidden: true,
-              url: '/polygen/upload-advanced',
               icon: 'upload'
             }
           ]
@@ -136,6 +108,63 @@ const state = {
         }
       ]
     },
+    {
+      label: '元数据',
+      url: '/meta/',
+      icon: 'star',
+      items: [
+        {
+          label: '元数据列表',
+          url: '/meta/list',
+          icon: 'list'
+        },
+        {
+          label: '系统预设',
+          url: '/meta/prefabs',
+          icon: 'list'
+        }
+      ]
+    },
+    {
+      label: '宇宙',
+      url: '/verse/',
+      icon: 'adjust',
+      items: [
+        {
+          label: '自己创造',
+          url: '/meta-verse/index',
+          icon: 'list'
+        },
+        {
+          label: '系统推荐',
+          url: '/meta-verse/open',
+          icon: 'list'
+        },
+        {
+          label: '朋友分享',
+          url: '/meta-verse/share',
+          icon: 'list'
+        }
+      ]
+    },/*
+    {
+      label: '场景',
+      url: '/space/',
+      icon: 'home',
+      items: [
+        {
+          label: '场景列表',
+          url: '/space/index/',
+          icon: 'list'
+        },
+        {
+          label: '场景上传',
+          url: '/space/upload/',
+          icon: 'upload'
+        }
+      ]
+    },*/
+
 
     {
       label: '探索',
@@ -150,20 +179,7 @@ const state = {
         }
       ]
     },
-    /*
-    {
-      label: '充值',
-      url: '/trades/',
-      icon: 'dollar-sign',
-      hidden: environment.local,
-      items: [
-        {
-          label: '付款',
-          url: '/trades/pay',
-          icon: 'dollar-sign'
-        }
-      ]
-    },*/
+
     {
       label: '交流',
       url: '/community/index',

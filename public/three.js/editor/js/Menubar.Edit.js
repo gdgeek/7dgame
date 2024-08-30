@@ -136,7 +136,7 @@ function MenubarEdit(editor) {
 	option.onClick(function () {
 		editor.scene.traverse(fixColorMap)
 	})
-	options.add(option)
+	//options.add(option)
 
 	const colorMaps = ['map', 'envMap', 'emissiveMap']
 

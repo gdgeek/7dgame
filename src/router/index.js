@@ -44,6 +44,59 @@ export const constantRoutes = [
 
     children: [
       {
+        path: 'meta',
+        name: 'Meta',
+        meta: { title: '元数据' },
+        redirect: '/meta/list',
+        component: Empty,
+        children: [
+
+          {
+            path: 'list',
+            name: 'MetaList',
+            meta: { title: '元数据列表' },
+            component: () => import('@/views/meta/list')
+          },
+          {
+            path: 'prefabs',
+            name: 'MetaPrefabs',
+            meta: { title: '系统预设' },
+            component: () => import('@/views/meta/prefabs')
+          },
+          {
+            path: 'prefab-edit',
+            name: 'PrefabEdit',
+            meta: { title: '编辑' },
+            component: () => import('@/views/meta/prefab-edit')
+          },
+          {
+            path: 'meta-edit',
+            name: 'MetaEdit',
+            meta: { title: '编辑' },
+            component: () => import('@/views/meta/meta-edit')
+          },
+          {
+            path: 'rete-meta',
+            name: 'VerseMetaEditor',
+            meta: { title: '【元】' },
+            component: () => import('@/views/meta/rete-meta')
+          },
+          {
+            path: 'script',
+            name: 'MetaScript',
+            meta: { title: '脚本' },
+            component: () => import('@/views/meta/script')
+          },
+          {
+            path: 'scene',
+            name: 'MetaSceneEditor',
+            meta: { title: '内容编辑' },
+            component: () => import('@/views/meta/scene')
+          }
+        ]
+      },
+
+      {
         meta: { title: '个人中心' },
         path: 'home',
         name: 'Home',
@@ -157,16 +210,37 @@ export const constantRoutes = [
             component: () => import('@/views/polygen/upload')
           },
           {
-            path: 'upload-advanced',
-            name: 'PolygenUploadAdvanced',
-            meta: { title: '模型上传(高级)' },
-            component: () => import('@/views/polygen/upload-advanced')
-          },
-          {
             path: 'view',
             name: 'PolygenView',
             meta: { title: '模型处理' },
             component: () => import('@/views/polygen/view')
+          }
+        ]
+      },
+      {
+        path: 'voxel',
+        name: 'Voxel',
+        meta: { title: '体素资源' },
+        redirect: '/voxel/index',
+        component: Empty,
+        children: [
+          {
+            meta: { title: '列表' },
+            path: 'index',
+            name: 'VoxelIndex',
+            component: () => import('@/views/voxel/index')
+          },
+          {
+            path: 'upload',
+            name: 'VoxelUpload',
+            meta: { title: '体素上传' },
+            component: () => import('@/views/voxel/upload')
+          },
+          {
+            path: 'view',
+            name: 'VoxelView',
+            meta: { title: '体素处理' },
+            component: () => import('@/views/voxel/view')
           }
         ]
       },
@@ -252,37 +326,9 @@ export const constantRoutes = [
         ]
       },
       {
-        path: 'meta',
-        name: 'Meta',
-        meta: { title: '元' },
-        redirect: '/meta/rete-meta',
-        component: Empty,
-        children: [
-          {
-            path: 'rete-meta',
-            name: 'VerseMetaEditor',
-            meta: { title: '【元】' },
-            component: () => import('@/views/meta/rete-meta')
-          },
-          {
-            path: 'cyber',
-            name: 'VerseCyber',
-            meta: { title: '逻辑' },
-            component: () => import('@/views/meta/cyber')
-          },
-          {
-            path: 'scene',
-            name: 'MetaSceneEditor',
-            meta: { title: '内容编辑' },
-            component: () => import('@/views/meta/scene')
-          }
-        ]
-      },
-
-      {
         path: 'meta-verse',
         name: 'MetaVerse',
-        meta: { title: '元&宇宙' },
+        meta: { title: '宇宙' },
         redirect: '/meta-verse/index',
         component: Empty,
         children: [
@@ -318,6 +364,19 @@ export const constantRoutes = [
             name: 'VerseView',
             meta: { title: '【宇宙】' },
             component: () => import('@/views/verse/view')
+          },
+          /*
+                    {
+                      path: 'verse-script',
+                      name: 'VerseScript',
+                      meta: { title: '脚本' },
+                      component: () => import('@/views/verse/verse-script')
+                    },*/
+          {
+            path: 'script',
+            name: 'Script',
+            meta: { title: '脚本' },
+            component: () => import('@/views/verse/script')
           },
           {
             path: 'rete-verse',
@@ -448,6 +507,12 @@ export const constantRoutes = [
         component: () => import('@/views/site/index')
       },
       {
+        meta: { title: '相关下载' },
+        path: 'download',
+        name: 'WebDownload',
+        component: () => import('@/views/site/download')
+      },
+      {
         path: 'wechat-signup',
         meta: { title: '微信注册/绑定' },
         name: 'SiteSignup',
@@ -467,13 +532,38 @@ export const constantRoutes = [
       }
     ]
   },
-
+  {
+    path: '/blog',
+    component: Web,
+    hidden: true,
+    redirect: '/blog/index',
+    children: [
+      {
+        meta: { title: '开发博客' },
+        path: 'index',
+        name: 'BlogIndex',
+        component: () => import('@/views/blog/index')
+        // component: () => import('@/views/portal/index')
+      },
+      {
+        meta: { title: '开发博客文章' },
+        path: 'document',
+        name: 'BlogDocument',
+        component: () => import('@/views/blog/document')
+      },
+      {
+        meta: { title: '开发博客分类' },
+        path: 'category',
+        name: 'BlogCategory',
+        component: () => import('@/views/blog/category')
+      }
+    ]
+  },
   {
     path: '/web',
     component: Web,
     hidden: true,
     redirect: '/web/index',
-
     children: [
       {
         meta: { title: '平台入口' },
@@ -481,12 +571,6 @@ export const constantRoutes = [
         name: 'WebIndex',
         component: () => import('@/views/web/index')
         // component: () => import('@/views/portal/index')
-      },
-      {
-        meta: { title: '相关下载' },
-        path: 'download',
-        name: 'WebDownload',
-        component: () => import('@/views/web/download')
       },
       {
         meta: { title: '案例展示' },
@@ -505,6 +589,12 @@ export const constantRoutes = [
         path: 'document',
         name: 'WebDocument',
         component: () => import('@/views/web/document')
+      },
+      {
+        meta: { title: '文档分类' },
+        path: 'category',
+        name: 'WebCategory',
+        component: () => import('@/views/web/category')
       },
       {
         meta: { title: '沙盘制作' },
@@ -542,6 +632,12 @@ export const constantRoutes = [
         path: 'publicity',
         name: 'Publicity',
         component: () => import('@/views/web/publicity')
+      },
+      {
+        meta: { title: '隐私策略' },
+        path: 'privacy-policy',
+        name: 'Privacy Policy',
+        component: () => import('@/views/web/privacy-policy')
       }
     ]
   },

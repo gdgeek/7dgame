@@ -20,12 +20,12 @@ const block = {
             },
             {
               type: 'input_value',
-              name: 'scale',
+              name: 'rotate',
               check: 'Vector3'
             },
             {
               type: 'input_value',
-              name: 'rotate',
+              name: 'scale',
               check: 'Vector3'
             }
           ],
@@ -61,9 +61,9 @@ const block = {
         'CS.MLua.Transform(' +
         value_position +
         ', ' +
-        value_scale +
-        ', ' +
         value_rotate +
+        ', ' +
+        value_scale +
         ')'
       // TODO: Change ORDER_NONE to the correct strength.
       return [code, Blockly.Lua.ORDER_NONE]

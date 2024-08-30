@@ -53,18 +53,15 @@ const block = {
     const lua = function (block) {
       var dropdown_option = block.getFieldValue('Action')
       var statements_content = Blockly.Lua.statementToCode(block, 'content')
-      // TODO: Assemble Lua into code variable.
-      var code = '..'
+
 
       var code =
-        "meta['@" +
-        dropdown_option +
-        "'] = function(parameter) \n\
-  print('" +
-        dropdown_option +
-        "')\n" +
-        statements_content +
-        'end\n'
+        "meta['@" + dropdown_option + "'] = function(parameter) \n\
+  is_playing = true\n\
+  print('" + dropdown_option + "')\n\
+" + statements_content + '\n\
+  is_playing = false\n\
+end\n'
 
       return code
     }

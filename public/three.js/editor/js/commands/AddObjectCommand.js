@@ -8,14 +8,14 @@ import { ObjectLoader } from 'three';
  */
 class AddObjectCommand extends Command {
 
-	constructor( editor, object ) {
+	constructor(editor, object) {
 
-		super( editor );
+		super(editor);
 
 		this.type = 'AddObjectCommand';
 
 		this.object = object;
-		if ( object !== undefined ) {
+		if (object !== undefined) {
 
 			this.name = `Add Object: ${object.name}`;
 
@@ -24,21 +24,21 @@ class AddObjectCommand extends Command {
 	}
 
 	execute() {
-		this.editor.addObject( this.object );
-		this.editor.select( this.object );
+		this.editor.addObject(this.object);
+		this.editor.select(this.object);
 
 	}
 
 	undo() {
 
-		this.editor.removeObject( this.object );
+		this.editor.removeObject(this.object);
 		this.editor.deselect();
 
 	}
 
 	toJSON() {
 
-		const output = super.toJSON( this );
+		const output = super.toJSON(this);
 
 		output.object = this.object.toJSON();
 
@@ -46,16 +46,16 @@ class AddObjectCommand extends Command {
 
 	}
 
-	fromJSON( json ) {
+	fromJSON(json) {
 
-		super.fromJSON( json );
+		super.fromJSON(json);
 
-		this.object = this.editor.objectByUuid( json.object.object.uuid );
+		this.object = this.editor.objectByUuid(json.object.object.uuid);
 
-		if ( this.object === undefined ) {
+		if (this.object === undefined) {
 
 			const loader = new ObjectLoader();
-			this.object = loader.parse( json.object );
+			this.object = loader.parse(json.object);
 
 		}
 

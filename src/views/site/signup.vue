@@ -56,20 +56,20 @@
         <router-link to="/site/resend-verification-email">
           <el-link type="primary" :underline="false">重新发送验证邮件</el-link>
         </router-link>
-        <br>
+        <br />
       </div>
       <div class="signup-link">
         <router-link to="/site/login">
           <el-link type="primary" :underline="false">登录账号</el-link>
         </router-link>
-        <br>
+        <br />
         <router-link to="/site/request-password-reset">
           <el-link type="primary" :underline="false">找回密码</el-link>
         </router-link>
-        <br>
+        <br />
       </div>
     </div>
-    <hr>
+    <hr />
     <div class="signup-body">
       <div class="signup-hint">微信扫码，得到测试资格</div>
       <img
@@ -77,7 +77,7 @@
         class="signup-qrcode"
         width="100%"
         alt="qrcode"
-      >
+      />
     </div>
   </mr-p-p-site>
 </template>

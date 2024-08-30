@@ -4,7 +4,6 @@ const state = {
 
 const mutations = {
   setBreadcrumbs(state, { list }) {
-    //alert(list)
     state.list = list
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="background-screen-border">
     <!-- 展馆主屏幕 -->
-    <exhibition-screen />
+    <screen :bg-url="bgUrl" :item="screen" />
     <!-- 图片场景介绍 -->
     <exhibition-picture />
     <!-- 视频案例 -->
@@ -11,36 +11,43 @@
     <!-- 技术服务 -->
     <exhibition-list />
     <!-- 联系我们 -->
-    <medical-relation :is-black="isBlack" />
+    <relation :is-black="isBlack" />
     <!-- 合作伙伴板块新通用组件 -->
-    <exhibition-partner />
+    <partner />
   </div>
 </template>
 
 <script>
 import 'element-ui/lib/theme-chalk/display.css'
-import ExhibitionScreen from '@/components/Exhibition/ExhibitionScreen.vue'
+import Screen from '@/components/WebPublick/Screen.vue'
 import ExhibitionPicture from '@/components/Exhibition/ExhibitionPicture.vue'
 import ExhibitionVideo from '@/components/Exhibition/ExhibitionVideo.vue'
 import ExhibitionBody from '@/components/Exhibition/ExhibitionBody.vue'
-import MedicalRelation from '@/components/Medical/MedicalRelation.vue'
+import Relation from '@/components/WebPublick/Relation.vue'
 import ExhibitionList from '@/components/Exhibition/ExhibitionList.vue'
-import ExhibitionPartner from '@/components/Exhibition/ExhibitionPartner.vue'
+import Partner from '@/components/WebPublick/Partner.vue'
 
 export default {
   name: 'Exhibition',
   components: {
-    ExhibitionScreen,
+    Screen,
     ExhibitionPicture,
     ExhibitionVideo,
     ExhibitionBody,
-    MedicalRelation,
+    Relation,
     ExhibitionList,
-    ExhibitionPartner
+    Partner
   },
   data() {
     return {
-      // isBlack -- title color props
+      bgUrl: '/media/bg/ex-screen.jpg',
+      screen: {
+        title: '欢迎创建',
+        title2: '元宇宙实景展馆',
+        color: '#f5f4f3',
+        tel: '15000159790',
+        align: 'left'
+      },
       isBlack: true
     }
   }

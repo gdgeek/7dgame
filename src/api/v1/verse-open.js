@@ -2,7 +2,7 @@ import request from '@/utils/request'
 var qs = require('querystringify')
 var path = require('path')
 
-export function getVersesOpens(
+export function getVerseOpenVerses(
   sort = '-created_at',
   search = '',
   page = 0,
@@ -20,7 +20,7 @@ export function getVersesOpens(
   }
 
   return request({
-    url: path.join('v1', 'verse-opens' + qs.stringify(query, true)),
+    url: path.join('v1', 'verse-opens', 'verses' + qs.stringify(query, true)),
     method: 'get'
   })
 }

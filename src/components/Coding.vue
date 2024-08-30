@@ -27,8 +27,6 @@ import { putCyber } from '@/api/v1/cyber'
 
 import 'blockly/lua'
 
-// import hljs from 'highlight.js/lib/common'
-// import hljsVuePlugin from '@highlightjs/vue-plugin'
 export default {
   name: 'Coding',
   props: {
@@ -49,9 +47,7 @@ export default {
       require: true
     }
   },
-  /* components: {
-    highlightjs: hljsVuePlugin.component
-  },*/
+
   data() {
     return {
       workspace: null,
@@ -61,12 +57,10 @@ export default {
   },
 
   mounted() {
-    const self = this
-
     if (this.meta.data) {
       AddBlocks({
-        index: self.index,
-        resource: self.getResource(this.meta)
+        index: this.index,
+        resource: this.getResource(this.meta)
       })
     }
 
@@ -92,10 +86,10 @@ export default {
       }
     })
 
-    if (self.cyber && self.cyber.data) {
-      self.load(self.cyber.data)
+    if (this.cyber && this.cyber.data) {
+      this.load(this.cyber.data)
     }
-    console.log(this.workspace) /**/
+    console.log(this.workspace)
   },
   methods: {
     getResource(meta) {
@@ -103,21 +97,29 @@ export default {
 
       const ret = {
         action: [],
+        trigger: [],
         polygen: [],
         picture: [],
         video: [],
+        voxel: [],
         text: [],
         sound: [],
         entity: [],
-        input: [],
-        output: []
+        events: {
+          inputs: [],
+          outputs: [],
+        },
       }
-      if (meta.event !== null) {
-        const event = JSON.parse(meta.event.data)
-        ret.input = event.input
-        ret.output = event.output
+      ret.events = JSON.parse(meta.events)
+      if(!ret.events) {
+        ret.events = {}
       }
-
+      if(!ret.events.inputs) {
+        ret.events.inputs = []
+      }
+      if(!ret.events.outputs) {
+        ret.events.outputs = []
+      }
       this.addMetaData(data, ret)
       return ret
     },
@@ -131,9 +133,11 @@ export default {
       const entity = self.testPoint(data, [
         'polygen',
         'entity',
+        'voxel',
         'video',
         'picture',
-        'text'
+        'text',
+        'voxel',
       ])
 
       if (entity) {
@@ -167,6 +171,11 @@ export default {
 
       if (text) {
         ret.text.push(text)
+      }
+      const voxel = self.testPoint(data, ['voxel'])
+    
+      if (voxel) {
+        ret.voxel.push(voxel)
       }
 
       if (typeof data.children !== 'undefined') {
@@ -211,7 +220,7 @@ export default {
     handleClick(tab, event) {
       if (this.activeName === 'script') {
         this.script =
-          'local meta = {}\n\n' + Blockly.Lua.workspaceToCode(this.workspace)
+          'local meta = {}\nindex = \'\'\n' + Blockly.Lua.workspaceToCode(this.workspace)
       }
       console.log(tab, event)
     },
@@ -225,7 +234,7 @@ export default {
 
       try {
         const script =
-          'local meta = {}\n\n' + Blockly.Lua.workspaceToCode(this.workspace)
+           'local meta = {}\nindex = \'\'\n' + Blockly.Lua.workspaceToCode(this.workspace)
 
         const response = await putCyber(this.cyber.id, {
           data: JSON.stringify(data),

@@ -39,7 +39,7 @@ div h1{
 div h2{
   font-family: 'SourceHanSansSC-VF';
   font-weight: 400;
-  font-size: 26px;
+  font-size: 24px;
 } 
 
 div h3{
@@ -47,26 +47,27 @@ div h3{
   font-weight: 400;
   font-size: 20px;
 } 
-
-
+/* sub title */
 div h4{
+  margin: 0;
   font-family: 'SourceHanSansSC-VF';
   font-weight: 400;
-  font-size: 16px;
-  font-weight: lighter;
+  font-size: 18px;
 } 
+/* p text content */
 div h5{
   font-family: 'SourceHanSansSC-VF';
   font-weight: 400;
   font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: 1px;
+  text-align: justify;
 } 
-.font-title {
-  
+
+.font-title {  
   font-family: 'SmileySans-Oblique';
   font-weight: 100
 }
-
-
 
 .font-text {
   font-family: 'SourceHanSansSC-VF';

@@ -28,7 +28,7 @@
       <el-button class="font-text" @click="goto('/site/index')" type="primary">
         登入平台
       </el-button>
-      <el-button class="font-text" @click="goto('/web/download')">
+      <el-button class="font-text" @click="goto('/site/download')">
         相关下载
       </el-button>
     </div>

@@ -3,7 +3,7 @@ function printVector3(vec) {
   return '(' + vec.x + ', ' + vec.y + ', ' + vec.z + ')'
 }
 function printVector2(vec) {
-  return '(' + vec.x + ', ' + vec.y +')'
+  return '(' + vec.x + ', ' + vec.y + ')'
 }
 function cutString(str, len) {
   if (str.length * 2 <= len) {
@@ -27,5 +27,37 @@ function cutString(str, len) {
   }
   return s
 }
+function isHttps() {
+  // 获取当前页面的协议
+  const protocol = window.location.protocol;
+  // 检查协议是否是HTTPS
+  if (protocol === 'https:') {
+    console.log("这个网页是使用HTTPS");
+    return true;
+  } else {
+    console.log("这个网页不是使用HTTPS");
+    return false;
+  }
+}
+function convertToHttps(url) {
 
-export { printVector3, printVector2, cutString }
+  if (isHttps()) {
+    if ((url !== undefined || url !== null & url.startsWith('http://'))) {
+
+      // 替换'http://'为'https://'
+      return url.replace('http://', 'https://');
+    }
+  } else {
+    if ((url !== undefined || url !== null & url.startsWith('https://'))) {
+
+      // 替换'http://'为'https://'
+      return url.replace('https://', 'http://');
+    }
+  }
+
+  // 检查URL是否以http://开头
+
+
+  return url;
+}
+export { isHttps, convertToHttps, printVector3, printVector2, cutString }

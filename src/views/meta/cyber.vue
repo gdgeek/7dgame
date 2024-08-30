@@ -6,7 +6,12 @@
           <div slot="header" class="clearfix">
             <router-link
               v-if="meta"
-              :to="'/meta/rete-meta?id=' + meta.id + '&title=' + title"
+              :to="
+                '/meta/rete-meta?id=' +
+                meta.id +
+                '&title=' +
+                encodeURIComponent(title)
+              "
             >
               <el-link v-if="meta" :underline="false">
                 【元：{{ title }}】
@@ -16,7 +21,7 @@
 
             <el-button-group style="float: right">
               <el-button
-                v-if="canSave"
+                v-if="saveable"
                 type="primary"
                 size="mini"
                 @click="save()"
@@ -47,7 +52,7 @@ import Coding from '@/components/Coding.vue'
 import { mapMutations } from 'vuex'
 import { getMeta } from '@/api/v1/meta'
 import { postCyber } from '@/api/v1/cyber'
-import { AbilityWorks, AbilityShare } from '@/ability/ability'
+import { AbilityEditable } from '@/ability/ability'
 var qs = require('querystringify')
 var path = require('path')
 export default {
@@ -69,17 +74,12 @@ export default {
     title() {
       return this.$route.query.title
     },
-    canSave() {
-      const self = this
-
-      if (self.meta === null) {
+    saveable() {
+      if (this.meta === null) {
         return false
       }
 
-      return (
-        self.$can('update', new AbilityWorks(self.meta.author_id)) ||
-        self.$can('share', new AbilityShare(self.meta.share))
-      )
+      return this.$can('editable', new AbilityEditable(this.meta.editable))
     }
   },
   destroyed() {
@@ -95,9 +95,8 @@ export default {
         },
         {
           path: '/meta-verse/index',
-          meta: { title: '元&宇宙' }
+          meta: { title: '宇宙' }
         },
-
         {
           path: '.',
           meta: { title: '赛博编辑' }
@@ -115,18 +114,22 @@ export default {
         },
         {
           path: '/meta-verse/index',
-          meta: { title: '元&宇宙' }
+          meta: { title: '宇宙' }
         },
         {
           path: '/verse/view?id=' + self.meta.verse_id,
           meta: { title: '【宇宙】' }
         },
         {
-          path: '/verse/rete-verse?id=' + self.meta.verse_id,
+          path: '/verse/scene?id=' + self.meta.verse_id,
           meta: { title: '宇宙编辑' }
         },
         {
-          path: '/meta/rete-meta?id=' + self.meta.id + '&title=' + self.title,
+          path:
+            '/meta/rete-meta?id=' +
+            self.meta.id +
+            '&title=' +
+            encodeURIComponent(self.title),
           meta: { title: '元编辑' }
         },
         {
@@ -136,7 +139,7 @@ export default {
       ]
     })
     if (self.meta.cyber === null) {
-      if (this.canSave) {
+      if (this.saveable) {
         const response = await postCyber({ meta_id: self.meta.id })
         self.cyber = response.data
       }
@@ -146,7 +149,7 @@ export default {
   },
 
   beforeDestroy() {
-    if (this.canSave) {
+    if (this.saveable) {
       this.save()
     }
   },

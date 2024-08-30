@@ -15,7 +15,7 @@ export default {
   },
   computed: {
     ...mapState({
-      store: state => state.config.advanced
+      store: state => state.config.store
     })
   },
   methods: {
@@ -33,28 +33,6 @@ export default {
         .catch(err => {
           console.error(err)
         })
-      /*
-      console.error('==2==')
-      self.store.fileConvert(
-        'b4588534775361ef248e240617b4e9d1.stl',
-        p => {
-          console.error(p)
-        },
-        key => {
-          console.error(key)
-        }
-      )
-      console.error('====')
-      /* self.store
-        .fileConvert('b4588534775361ef248e240617b4e9d1.stl', p => {
-          console.error(p)
-        })
-        .then(key => {
-          alert(1)
-        })
-        .catch(err => {
-          console.error(err)
-        })*/
     }
   }
 }

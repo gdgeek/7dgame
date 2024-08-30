@@ -59,7 +59,8 @@
 </template>
 <script>
 import { getVideo, putVideo, deleteVideo } from '@/api/resources'
-import { postFile } from '@/api/files'
+
+import { postFile } from '@/api/v1/files'
 import { printVector2 } from '@/assets/js/helper'
 import { mapState } from 'vuex'
 
@@ -139,30 +140,25 @@ export default {
         }, image_type)
       })
     },
-    save(md5, extension, info, file, handler) {
-      const self = this
+    async save(md5, extension, info, file, handler) {
       const data = {
         md5,
         key: md5 + extension,
         filename: file.name,
-        url: self.store.fileUrl(md5, extension, handler, 'screenshot/video')
+        url: this.store.fileUrl(md5, extension, handler, 'screenshot/video')
       }
-      postFile(data)
-        .then(response => {
-          const video = { image_id: response.data.id, info }
-          putVideo(self.data.id, video)
-            .then(response => {
-              self.data.image_id = response.data.image_id
-              self.data.info = response.data.info
-              self.expire = false
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      try {
+        const response1 = await postFile(data)
+
+        const video = { image_id: response1.data.id, info }
+        const response2 = await putVideo(this.data.id, video)
+
+        this.data.image_id = response2.data.image_id
+        this.data.info = response2.data.info
+        this.expire = false
+      } catch (e) {
+        console.error(e)
+      }
     },
 
     async setup(video, size) {
@@ -175,17 +171,15 @@ export default {
         blob.extension = '.jpg'
         const file = blob
         const md5 = await store.fileMD5(file)
-        const handler = await store.storeHandler()
-        const ret = await store.fileHas(
+        const handler = await store.publicHandler()
+        const has = await store.fileHas(
           md5,
           file.extension,
           handler,
           'screenshot/video'
         )
-        if (ret !== null) {
-          self.save(ret.md5, ret.extension, info, file, handler)
-        } else {
-          const r = await store.fileUpload(
+        if (!has) {
+          await store.fileUpload(
             md5,
             file.extension,
             file,
@@ -193,8 +187,9 @@ export default {
             handler,
             'screenshot/video'
           )
-          self.save(md5, file.extension, info, file, handler)
         }
+
+        await self.save(md5, file.extension, info, file, handler)
       }
     },
     init: function () {
@@ -215,15 +210,14 @@ export default {
       )
     },
     dealWith: function () {
-      const self = this
-      if (!self.prepare) {
+      if (!this.prepare) {
         const video = document.getElementById('video')
         // 获取新的视频
         const new_video = document.getElementById('new_video')
         const size = { x: video.videoWidth, y: video.videoHeight }
-        self.setup(new_video, size)
+        this.setup(new_video, size)
       } else {
-        self.expire = false
+        this.expire = false
       }
     },
     deleteWindow: function () {
@@ -248,18 +242,16 @@ export default {
           })
         })
     },
-    delete: function (id) {
-      const self = this
-      console.log(self.api + '/resources/' + id + '?type=video')
+    delete: async function (id) {
+      console.log(this.api + '/resources/' + id + '?type=video')
+      try {
+        await deleteVideo(id)
 
-      deleteVideo(id)
-        .then(response => {
-          self.$router.push({ path: '/video/index' })
-        })
-        .catch(function (error) {
-          console.log(error)
-          self.failed(JSON.parse(error.message))
-        })
+        this.$router.push({ path: '/video/index' })
+      } catch (err) {
+        console.error(err)
+        this.failed(JSON.parse(err.message))
+      }
     },
     namedWindow: function () {
       const self = this
@@ -283,17 +275,15 @@ export default {
           })
         })
     },
-    named: function (id, name) {
-      const self = this
+    named: async function (id, name) {
       const video = { name }
       console.log(video)
-      putVideo(id, video)
-        .then(response => {
-          self.data.name = response.data.name
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      try {
+        const response = await putVideo(id, video)
+        this.data.name = response.data.name
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }

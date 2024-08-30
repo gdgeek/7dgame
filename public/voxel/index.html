@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <title>7D Game</title>
+
+
+  <style type="text/css">
+    div#voxel {
+      cursor: default;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body style="height:100%;">
+  <div style=" height:340px;">
+    <div id="voxel" style="background-color: black;"></div>
+  </div>
+
+
+  <script src="/voxel/library/three/three.min.js"></script>
+  <script src="/voxel/library/three/three.vox.js"></script>
+  <script src="/voxel/library/voxel/BGShader.js"></script>
+  <script src="/voxel/library/three/Detector.js"></script>
+  <script src="/voxel/library/voxel/sword.js"></script>
+  <script src="/voxel/library/voxel/voxel.js"></script>
+  <script src="/voxel/library/voxel/voxel.action.js"></script>
+  <script src="/voxel/library/voxel/mesh.js"></script>
+  <script type="text/javascript">
+
+
+    voxel = new Voxel(document.getElementById("voxel"));
+    voxel.setTexture("/basic/web/img/shadowall2.png");
+    voxel.changeMesh(10, gdgeek_vox_json_temp, function () { });
+
+  </script>
+</body>
+
+</html>

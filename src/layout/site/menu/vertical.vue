@@ -8,15 +8,13 @@
         @toggleClick="selectedMenu"
       />
       <breadcrumb class="breadcrumb-container" />
-      <login :_style="'width: 100%; padding: 7px'"/>
-    
+      <login :_style="'width: 100%; padding: 7px'" />
     </div>
     <div :class="'sidebar-container'">
-      <logo :collapse = "false" />
+      <logo :collapse="false" />
       <el-scrollbar wrap-class="scrollbar-wrapper">
         <el-menu
-
-        :router ="true"
+          :router="true"
           mode="veritcal"
           :background-color="variables.menuBg"
           :text-color="variables.menuText"
@@ -24,8 +22,13 @@
           :active-text-color="variables.menuActiveText"
           :collapse-transition="false"
         >
-          <el-menu-item v-for="(item, index) in data"  :key="index" :index="item.path">{{item.text}}</el-menu-item>
-        
+          <el-menu-item
+            v-for="(item, index) in data"
+            :key="index"
+            :index="item.path"
+          >
+            {{ item.text }}
+          </el-menu-item>
         </el-menu>
       </el-scrollbar>
     </div>
@@ -40,7 +43,6 @@ import Login from './login.vue'
 import variables from '@/styles/variables.scss'
 import { data } from '@/layout/site/menu/data.js'
 export default {
-  
   props: {
     openMenu: {
       type: Boolean,
@@ -56,7 +58,8 @@ export default {
   computed: {
     variables() {
       return variables
-    }, data() {
+    },
+    data() {
       return data
     }
   },

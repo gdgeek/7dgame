@@ -55,9 +55,9 @@
 </template>
 <script>
 import { getSpace, putSpace, deleteSpace } from '@/api/v1/space'
-//import { createVerseFromPolygen } from '@/api/v1/meta-verse'
-import { postFile } from '@/api/files'
-//import { printVector3 } from '@/assets/js/helper'
+//import { createVerseFromResource } from '@/api/v1/meta-verse'
+
+import { postFile } from '@/api/v1/files'
 import { mapState } from 'vuex'
 import Three from '@/components/Three.vue'
 
@@ -262,17 +262,15 @@ export default {
             blob.extension = '.jpg'
             const file = blob
             const md5 = await store.fileMD5(file)
-            const handler = await store.storeHandler()
-            const ret = await store.fileHas(
+            const handler = await store.publicHandler()
+            const has = await store.fileHas(
               md5,
               file.extension,
               handler,
               'screenshot/space'
             )
-            if (ret !== null) {
-              await self.saveFile(ret.md5, ret.extension, info, file, handler)
-            } else {
-              const r = store.fileUpload(
+            if (!has) {
+              await store.fileUpload(
                 md5,
                 file.extension,
                 file,
@@ -280,8 +278,9 @@ export default {
                 handler,
                 'screenshot/space'
               )
-              await self.saveFile(md5, file.extension, info, file, handler)
             }
+
+            await self.saveFile(md5, file.extension, info, file, handler)
           }
         } catch (err) {
           reject(err)

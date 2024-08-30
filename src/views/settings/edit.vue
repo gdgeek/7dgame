@@ -211,25 +211,49 @@
         <div slot="footer" class="dialog-footer">
           <el-button-group style="float: left">
             <!--   <el-button type="primary" plain @click="clearImgHandle">清除图片</el-button> -->
-            <el-button type="primary" plain @click="rotateLeftHandle">
+            <el-button
+              size="mini"
+              type="primary"
+              plain
+              @click="rotateLeftHandle"
+            >
               左旋转
             </el-button>
-            <el-button type="primary" plain @click="rotateRightHandle">
+            <el-button
+              size="mini"
+              type="primary"
+              plain
+              @click="rotateRightHandle"
+            >
               右旋转
             </el-button>
-            <el-button type="primary" plain @click="changeScaleHandle(1)">
+            <el-button
+              size="mini"
+              type="primary"
+              plain
+              @click="changeScaleHandle(1)"
+            >
               放大
             </el-button>
-            <el-button type="primary" plain @click="changeScaleHandle(-1)">
+            <el-button
+              size="mini"
+              type="primary"
+              plain
+              @click="changeScaleHandle(-1)"
+            >
               缩小
-            </el-button>
-            <el-button type="primary" plain @click="downloadHandle('blob')">
-              下载
             </el-button>
           </el-button-group>
           <el-button-group>
-            <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" :loading="loading" @click="finish">
+            <el-button size="mini" @click="dialogVisible = false">
+              取 消
+            </el-button>
+            <el-button
+              size="mini"
+              type="primary"
+              :loading="loading"
+              @click="finish"
+            >
               确认
             </el-button>
           </el-button-group>
@@ -245,7 +269,7 @@ import { mapGetters } from 'vuex'
 import { putUserData } from '@/api/v1/user'
 import { regionDataPlus, CodeToText } from 'element-china-area-data'
 
-import { postFile } from '@/api/files'
+import { postFile } from '@/api/v1/files'
 
 import { mapState } from 'vuex'
 
@@ -469,35 +493,26 @@ export default {
       // let cropAxis = [data.axis.x1, data.axis.y1, data.axis.x2, data.axis.y2]
       // console.log(cropAxis)
     },
-    saveAvatar(md5, extension, file, handler) {
-      const self = this
+    async saveAvatar(md5, extension, file, handler) {
       const data = {
         md5,
         key: md5 + extension,
         filename: file.name,
-        url: self.store.fileUrl(md5, extension, handler, 'backup')
+        url: this.store.fileUrl(md5, extension, handler, 'backup')
+      }
+      try {
+        const post = await postFile(data)
+        const put = await putUserData({ avatar_id: post.data.id })
+        this.refreshUserdata(put.data)
+        this.$message({
+          message: '修改头像成功',
+          type: 'success'
+        })
+      } catch (err) {
+        console.log(err)
       }
 
-      postFile(data)
-        .then(response => {
-          putUserData({ avatar_id: response.data.id })
-            .then(response => {
-              self.refreshUserdata(response.data)
-              this.$message({
-                message: '修改头像成功',
-                type: 'success'
-              })
-              this.loading = false
-            })
-            .catch(err => {
-              this.loading = false
-              console.log(err)
-            })
-        })
-        .catch(err => {
-          this.loading = false
-          console.log(err)
-        })
+      this.loading = false
     },
     async finish() {
       const self = this
@@ -510,14 +525,12 @@ export default {
         const file = blob
 
         const md5 = await store.fileMD5(file)
-        const handler = await store.storeHandler()
+        const handler = await store.publicHandler()
 
-        const ret = await store.fileHas(md5, file.extension, handler, 'backup')
+        const has = await store.fileHas(md5, file.extension, handler, 'backup')
 
-        if (ret !== null) {
-          self.saveAvatar(ret.md5, ret.extension, file, handler)
-        } else {
-          const r = await store.fileUpload(
+        if (!has) {
+          await store.fileUpload(
             md5,
             file.extension,
             file,
@@ -525,8 +538,8 @@ export default {
             handler,
             'backup'
           )
-          self.saveAvatar(md5, file.extension, file, handler)
         }
+        await self.saveAvatar(md5, file.extension, file, handler)
 
         this.dialogVisible = false
         this.loading = true

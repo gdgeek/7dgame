@@ -1,7 +1,6 @@
 <template>
   <div>
     <el-dialog
-      v-if="target !== null"
       :title="'事件管理窗口'"
       :visible.sync="visible"
       width="80%"
@@ -15,7 +14,7 @@
           </el-tag>
           <el-divider direction="vertical"></el-divider>
         </span>
-        <span v-if="this.output.list.length <= 2">
+        <span v-if="this.output.list.length <= 5">
           <el-input
             class="input-new-tag"
             v-if="output.visible"
@@ -42,7 +41,7 @@
           </el-tag>
           <el-divider direction="vertical"></el-divider>
         </span>
-        <span v-if="this.input.list.length <= 2">
+        <span v-if="this.input.list.length <= 5">
           <el-input
             class="input-new-tag"
             v-if="input.visible"
@@ -75,7 +74,11 @@
 import { v4 as uuidv4 } from 'uuid'
 export default {
   props: {
-    target: {
+    uuid: {
+      type: String,
+      default: -1
+    },
+    node: {
       type: Object,
       default: null
     }
@@ -99,12 +102,17 @@ export default {
 
   methods: {
     open() {
-      const self = this
       this.$nextTick(function () {
-        const data = JSON.parse(self.target.data)
-        self.input.list = data.input
-        self.output.list = data.output
-
+        this.input.list = []
+        if (this.node) {
+          this.node.inputs.forEach(element => {
+            this.input.list.push(element)
+          })
+          this.output.list = []
+          this.node.outputs.forEach(element => {
+            this.output.list.push(element)
+          })
+        }
         this.visible = true
       })
     },
@@ -150,8 +158,10 @@ export default {
     },
     enter() {
       this.$emit('postEvent', {
-        input: this.input.list,
-        output: this.output.list
+        node: this.node,
+        inputs: this.input.list,
+        outputs: this.output.list,
+        uuid: this.uuid
       })
     },
     handleClose(done) {

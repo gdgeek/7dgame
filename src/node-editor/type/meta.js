@@ -25,13 +25,6 @@ var MetaType = {
       key: 'transform',
       readonly: false
     },
-    /*
-    {
-      type: 'bool',
-      key: 'active',
-      title: '激活',
-      readonly: false
-    },*/
 
     {
       type: 'event',

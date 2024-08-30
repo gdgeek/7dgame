@@ -14,8 +14,8 @@
               element-loading-text="正在预处理"
               element-loading-background="rgba(255,255, 255, 0.3)"
               style="height: 300px; width: 100%"
-              :src="file"
-              :fit="'contain'"
+              :src="picture"
+              fit="contain"
               @load="dealWith()"
             />
           </div>
@@ -56,7 +56,9 @@
 </template>
 <script>
 import { getPicture, putPicture, deletePicture } from '@/api/resources'
-import { postFile } from '@/api/files'
+
+import { isHttps,  convertToHttps} from '@/assets/js/helper'
+import { postFile } from '@/api/v1/files'
 import { printVector2 } from '@/assets/js/helper'
 
 import { mapState } from 'vuex'
@@ -101,7 +103,9 @@ export default {
         return []
       }
     },
-
+    picture() { 
+      return convertToHttps(this.file)
+    },
     id() {
       return this.$route.query.id
     },
@@ -146,7 +150,7 @@ export default {
         }, image_type)
       })
     },
-    save(md5, extension, info, file, handler) {
+    async save(md5, extension, info, file, handler) {
       const self = this
       const data = {
         md5,
@@ -154,23 +158,17 @@ export default {
         filename: file.name,
         url: self.store.fileUrl(md5, extension, handler, 'screenshot/picture')
       }
+      try {
+        const response1 = await postFile(data)
+        const picture = { image_id: response1.data.id, info }
+        const response2 = await putPicture(self.data.id, picture)
 
-      postFile(data)
-        .then(response => {
-          const picture = { image_id: response.data.id, info }
-          putPicture(self.data.id, picture)
-            .then(response => {
-              self.data.image_id = response.data.image_id
-              self.data.info = response.data.info
-              self.expire = false
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(err => {
-          console.log(err)
-        })
+        self.data.image_id = response2.data.image_id
+        self.data.info = response2.data.info
+        self.expire = false
+      } catch (e) {
+        console.error(e)
+      }
     },
 
     async setup(size, image) {
@@ -194,17 +192,15 @@ export default {
       const file = blob
 
       const md5 = await store.fileMD5(file)
-      const handler = await store.storeHandler()
-      const ret = await store.fileHas(
+      const handler = await store.publicHandler()
+      const has = await store.fileHas(
         md5,
         file.extension,
         handler,
         'screenshot/picture'
       )
-      if (ret !== null) {
-        self.save(ret.md5, ret.extension, info, file, handler)
-      } else {
-        const r = await store.fileUpload(
+      if (!has) {
+        await store.fileUpload(
           md5,
           file.extension,
           file,
@@ -212,8 +208,8 @@ export default {
           handler,
           'screenshot/picture'
         )
-        self.save(md5, file.extension, info, file, handler)
       }
+      await self.save(md5, file.extension, info, file, handler)
     },
     dealWith: async function () {
       const self = this
@@ -252,18 +248,16 @@ export default {
           })
         })
     },
-    delete: function (id) {
-      const self = this
-      console.log(self.api + '/resources/' + id + '?type=picture')
+    delete: async function (id) {
+      console.log(this.api + '/resources/' + id + '?type=picture')
 
-      deletePicture(id)
-        .then(response => {
-          self.$router.push({ path: '/picture/index' })
-        })
-        .catch(function (error) {
-          console.log(error)
-          self.failed(JSON.parse(error.message))
-        })
+      try {
+        await deletePicture(id)
+        this.$router.push({ path: '/picture/index' })
+      } catch (err) {
+        console.error(err)
+        this.failed(JSON.parse(err.message))
+      }
     },
     namedWindow: function () {
       const self = this
@@ -287,17 +281,16 @@ export default {
           })
         })
     },
-    named: function (id, name) {
-      const self = this
+    named: async function (id, name) {
       const picture = { name }
       console.log(picture)
-      putPicture(id, picture)
-        .then(response => {
-          self.data.name = response.data.name
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      try {
+        const response = await putPicture(id, picture)
+        this.data.name = response.data.name
+      } catch (err) {
+        console.error(err)
+      }
+      console.log(picture)
     }
   }
 }

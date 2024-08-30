@@ -3,7 +3,7 @@
     <el-form :inline="true" ref="value" size="mini">
       <el-form-item :inline="true" class="el-form-item" :label="data.title">
         <div v-if="value_ === null">
-          <el-button @click="select()" size="mini">未指派</el-button>
+          <el-button @click="select()" size="mini">未指派2</el-button>
         </div>
         <div v-else>
           <div v-if="item === null">
@@ -74,6 +74,7 @@ export default {
   methods: {
     select() {
       this.root.openResources({
+        value: this.value,
         callback: this.onResource,
         type: this.data.resource
       })

@@ -233,7 +233,7 @@ export default {
             self.replies = []
           }
           const data = r.data
-          //alert(JSON.stringify(data))
+        
           //data.author_id = self.userData.id
           // data.updated_at = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
           self.replies.unshift(data)

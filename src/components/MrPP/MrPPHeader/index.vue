@@ -12,7 +12,7 @@
               type="success"
               label="名称排序"
               icon="el-icon-chat-dot-square"
-              @click="sort('name')"
+              @click="sort(sortByName)"
             >
               <span class="hidden-sm-and-down">名称排序</span>
               <i v-if="sorted_up" class="el-icon-arrow-up" />
@@ -24,7 +24,7 @@
               type="info"
               label="名称排序"
               icon="el-icon-chat-dot-square"
-              @click="sort('name')"
+              @click="sort(sortByName)"
             >
               <span class="hidden-sm-and-down">名称排序</span>
             </el-button>
@@ -34,7 +34,7 @@
               type="success"
               icon="el-icon-time"
               label="时间排序"
-              @click="sort('created_at')"
+              @click="sort(sortByTime)"
             >
               <span class="hidden-sm-and-down">时间排序</span>
               <i v-if="sorted_up" class="el-icon-arrow-up" />
@@ -46,7 +46,7 @@
               type="info"
               label="时间排序"
               icon="el-icon-time"
-              @click="sort('created_at')"
+              @click="sort(sortByTime)"
             >
               <span class="hidden-sm-and-down">时间排序</span>
             </el-button>
@@ -85,6 +85,14 @@ export default {
     searched: {
       type: String,
       required: true
+    },
+    sortByName: {
+      type: String,
+      default: 'name'
+    },
+    sortByTime: {
+      type: String,
+      default: 'created_at'
     }
   },
   data() {
@@ -94,10 +102,10 @@ export default {
   },
   computed: {
     sorted_created_at() {
-      return this.sorted.indexOf('created_at') !== -1
+      return this.sorted.indexOf(this.sortByTime) !== -1
     },
     sorted_name() {
-      return this.sorted.indexOf('name') !== -1
+      return this.sorted.indexOf(this.sortByName) !== -1
     },
     sorted_up() {
       return this.sorted.indexOf('-') !== 0
@@ -106,13 +114,13 @@ export default {
   methods: {
     search() {
       this.$emit('search', this.input)
+      this.input = ''
     },
     sort(value) {
       this.$emit('sort', (value === this.sorted ? '-' : '') + value)
     },
     keyDown(e) {
       if (e.keyCode === 13) {
-        // 用户点击了enter触发
         this.search()
       }
     }

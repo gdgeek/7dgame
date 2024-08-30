@@ -3,7 +3,6 @@ import path from 'path'
 import url from 'url'
 
 export function postSpace(data) {
-  //alert(111)
   return request({
     url: '/v1/spaces',
     method: 'post',

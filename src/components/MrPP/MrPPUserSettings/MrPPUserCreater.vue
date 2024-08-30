@@ -95,7 +95,7 @@
         <aside style="margin-top: 10px; margin-bottom: 15px; float: right">
           <el-button type="primary" plain size="mini" @click="gotoCreator()">
             <i class="el-icon-edit" />
-            进入as
+            进入
           </el-button>
         </aside>
       </div>

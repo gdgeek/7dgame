@@ -9,7 +9,7 @@
       </el-col>
       <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
         <div class="background-text" align="left">
-          <div class="background-text-title p-title-m">生态与支持</div>
+          <h1 class="p-title-m">生态与支持</h1>
           <p style="font-size: 18px; font-weight: lighter; line-height: 26px">
             MrPP.com
             是一款面向未来元宇宙数字生态的AR元宇宙实景平台。拥有第三方视角、空间场景定位等多项专利。给用户提供强大的编辑能力，一站式实现用户所需的可视化处理。
@@ -22,6 +22,7 @@
 </template>
 
 <script>
+import '@/assets/font/font.css'
 import 'element-ui/lib/theme-chalk/display.css'
 export default {
   name: 'ExhibitionList',
@@ -38,7 +39,6 @@ export default {
 .background-box {
   padding: 5% 0 60px;
   background-color: #222222;
-  // background-color: #f7f6f9;
 }
 
 .background-text {
@@ -46,10 +46,7 @@ export default {
   color: #fff;
   max-width: 660px;
 }
-.background-text-title {
-  font-size: 30px;
-  font-weight: 400;
-}
+
 .background-img {
   position: relative;
   width: 100%;

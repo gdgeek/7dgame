@@ -1,16 +1,24 @@
 import COS from 'cos-js-sdk-v5'
-import { token, store } from '@/api/v1/tencent-cloud'
-import { fileMD5, fileOpen } from './base.js'
+import { token, store, cloud } from '@/api/v1/tencent-cloud'
+import { fileMD5, fileOpen, sleep } from './base.js'
 import path from 'path'
-
+/*
 async function storeHandler() {
-  const response = await store()
-  return await fileHandler(
-    response.data.store.bucket,
-    response.data.store.region
-  )
-}
 
+  //const response = await store()
+  return await publicHandler()
+}*/
+async function publicHandler() { 
+  const response = await cloud()
+  return await fileHandler(response.data.public.bucket, response.data.public.region)
+}
+async function privateHandler() { 
+
+  const response = await cloud()
+  const handler = await fileHandler(response.data.private.bucket, response.data.private.region)
+
+  return handler
+}
 async function rawHandler() {
   const response = await store()
   return await fileHandler(response.data.raw.bucket, response.data.raw.region)
@@ -50,13 +58,6 @@ async function fileHandler(bucket, region) {
   })
 }
 
-async function sleep(time) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(null)
-    }, time)
-  })
-}
 async function fileProcess(
   md5,
   extension,
@@ -72,12 +73,11 @@ async function fileProcess(
         console.log(handler)
         const has = await fileHas(md5, extension, handler, dir)
 
-        if (has === null) {
+        if (!has) {
           progress((Date.now() - start) / (2 * time))
-
           await sleep(500)
         } else {
-          const file = await fileDownload(
+          const data = await fileDownload(
             md5,
             extension,
             function (p) {
@@ -87,21 +87,24 @@ async function fileProcess(
             dir
           )
           progress(1)
-          console.error(file)
-          resolve(file)
-          break
+          console.error(data)
+          resolve(data)
+          return
         }
       } while (Date.now() < start + time)
+
+      alert('处理超时！')
+
       throw 'overtime!'
     } catch (err) {
       reject(err)
     }
   })
 }
-async function fileDownload(md5, extension, progress, handler, dir = '') {
-  // const filename = md5 + extension
+async function fileDownload(name, extension, progress, handler, dir = '') {
   console.error(handler)
-  const filename = path.join(dir, md5 + extension)
+  const filename = path.join(dir, name + extension)
+
   return new Promise(async (resolve, reject) => {
     try {
       //下载文件
@@ -115,7 +118,7 @@ async function fileDownload(md5, extension, progress, handler, dir = '') {
         }
       })
       console.error(data)
-      resolve(data.Body)
+      resolve(JSON.parse(data.Body))
     } catch (err) {
       reject(err)
     }
@@ -123,7 +126,7 @@ async function fileDownload(md5, extension, progress, handler, dir = '') {
 }
 async function fileUpload(md5, extension, file, progress, handler, dir = '') {
   const filename = path.join(dir, md5 + extension)
-  //alert(filename)
+  console.error(filename)
   return new Promise(async (resolve, reject) => {
     try {
       // 分片上传文件
@@ -181,14 +184,14 @@ async function fileHas(md5, extension, handler, dir = '') {
   const filename = path.join(dir, md5 + extension)
   return new Promise(async (resolve, reject) => {
     try {
-      const data = await handler.cos.headObject({
+      await handler.cos.headObject({
         Bucket: handler.bucket,
         Region: handler.region,
         Key: filename
       })
-      resolve({ md5, extension })
+      resolve(true)
     } catch (err) {
-      resolve(null)
+      resolve(false)
     }
   })
 }
@@ -199,10 +202,11 @@ export default {
   fileHas,
   fileUrl,
   fileUpload,
-  //fileHandler,
   fileProcess,
   fileDownload,
-  storeHandler,
-  rawHandler,
+  //storeHandler,
+  //rawHandler,
+  publicHandler,
+  privateHandler,
   getUrl
 }

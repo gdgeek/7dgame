@@ -18,7 +18,7 @@
       </el-col>
 
       <el-col :span="3">
-        <login :_style="'float:right;width: 100%;padding: 12px;'" />
+        <login :_style="'float: right; width: 100%; padding: 12px'" />
       </el-col>
     </el-row>
   </span>
@@ -41,7 +41,7 @@ export default {
     }
   },
   created() {
-    // alert(data)
+    console.error(data)
   }
 }
 </script>

@@ -15,7 +15,6 @@ export function getCyber(id) {
 }
 
 export function putCyber(id, data) {
-  //alert(id)
   return request({
     url: 'v1/cybers/' + id,
     method: 'put',

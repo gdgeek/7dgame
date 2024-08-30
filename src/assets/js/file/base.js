@@ -53,5 +53,11 @@ async function fileOpen(accept) {
     }
   })
 }
-
-export { fileOpen, fileMD5 }
+async function sleep(time) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(null)
+    }, time)
+  })
+}
+export { fileOpen, fileMD5, sleep }

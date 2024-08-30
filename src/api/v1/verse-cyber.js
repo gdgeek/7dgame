@@ -8,7 +8,6 @@ export function postVerseCyber(data) {
 }
 
 export function getVerseCyber(id) {
-  //alert(id)
   return request({
     url: 'v1/verse-cybers/' + id,
     method: 'get'
@@ -32,7 +31,6 @@ export function getVerseCybers(sort = '-created_at', search = '', page = 0) {
 }
 
 export function putVerseCyber(id, data) {
-  //alert(id)
   return request({
     url: 'v1/verse-cybers/' + id,
     method: 'put',

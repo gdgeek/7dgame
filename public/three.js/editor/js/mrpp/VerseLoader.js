@@ -1,230 +1,249 @@
 import * as THREE from 'three'
-import { SceneBuilder } from './SceneBuilder.js'
-
+//import { SceneBuilder } from './SceneBuilder.js'
+import { GLTFLoader } from '../../../examples/jsm/loaders/GLTFLoader.js'
+import { DRACOLoader } from '../../../examples/jsm/loaders/DRACOLoader.js'
+import { VerseFactory } from './VerseFactory.js'
+import { MetaFactory } from './MetaFactory.js'
 function VerseLoader(editor) {
-	//editor.spaceLoader = this
+
+	const types = ['Module']
+
+	editor.selector = function (object) {
+
+		return types.includes(object.type);
+	}
+
 	const self = this
 
 	editor.signals.upload.add(function () {
 		self.save()
 	})
-	const builder = new SceneBuilder(editor)
+	const factory = new MetaFactory();
+	//const metaFactory = new MetaFactory();
+	//const builder = new SceneBuilder(editor)
 
-	this.createKnight = async function (meta, context) {
-		const matrix = builder.getMatrix4(meta.parameters.transform)
-		const data = {
-			metadata: {
-				version: 4.5,
-				type: 'Object',
-				generator: 'Object3D.toJSON'
-			},
-			object: {
-				uuid: meta.parameters.uuid,
-				type: 'Group',
-				name: meta.parameters.title,
-				layers: 1,
-				matrix: matrix.elements
-			}
-		}
 
-		let node = await builder.parseNode(data)
 
-		builder.addNode(node)
 
-		let e = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
-		if (context.info) {
-			const info = JSON.parse(context.info)
-			if (info.transform) {
-				const matrix = builder.getMatrix4(info.transform)
-				e = matrix.elements
-			}
-		}
-		const cdata = {
-			metadata: {
-				version: 4.5,
-				type: 'Object',
-				generator: 'Object3D.toJSON'
-			},
-			object: {
-				uuid: '8b6bfb36-c51d-4c21-9453-a8dd04ca53fe',
-				type: 'Group',
-				name: 'child',
-				layers: 1,
-				matrix: e
-			}
-		}
-		let child = await builder.parseNode(cdata)
-		const polygen = await builder.loadPolygen(context.mesh.file.url)
-
-		polygen.name = 'meta.parameters.title'
-		polygen.uuid = context.mesh.file.md5
-
-		child.add(polygen)
-		node.add(child)
-		builder.lockNode(child)
-		return node
-	}
-	this.addKnight = async function (meta, context) {
-		let node = editor.objectByUuid(meta.parameters.uuid)
-
-		if (typeof node === 'undefined') {
-			node = await this.createKnight(meta, context)
-		}
-		const matrix = builder.getMatrix4(meta.parameters.transform)
-		node.matrix = matrix
-	}
-
-	this.addMeta = async function (meta, context, resources) {
-		let root = editor.objectByUuid(meta.parameters.uuid)
-		const matrix = builder.getMatrix4(meta.parameters.transform)
-		if (typeof root === 'undefined') {
-			root = new THREE.Object3D()
-			root.name = meta.parameters.title
-			root.uuid = meta.parameters.uuid
-			root.type = 'Group'
-			root.locked = false
-			root.applyMatrix4(matrix)
-		}
-
-		if (context.children) {
-			for (let i = 0; i < context.children.entities.length; ++i) {
-				const node = await builder.addEntity(
-					context.children.entities[i],
-					resources
-				)
-
-				builder.lockNode(node)
-				root.add(node)
-			}
-		}
-		editor.addObject(root)
-	}
-
-	this.loadSpace = async function (data) {
-		const node = await builder.loadPolygen(data.mesh.url)
-		node.name = 'Space'
-		node.uuid = data.mesh.md5
-		return node
-	}
 
 	this.save = async function () {
-		const metas = this.verse.children.metas
-		metas.forEach(meta => {
-			const node = editor.objectByUuid(meta.parameters.uuid)
 
-			if (node) {
-				meta.parameters.name = node.name
-				meta.parameters.transform.position = {
-					x: node.position.x,
-					y: node.position.y,
-					z: node.position.z
-				}
-				meta.parameters.transform.rotate = {
-					x: (node.rotation.x / Math.PI) * 180,
-					y: (node.rotation.y / Math.PI) * 180,
-					z: (node.rotation.z / Math.PI) * 180
-				}
-				meta.parameters.transform.scale = {
-					x: node.scale.x,
-					y: node.scale.y,
-					z: node.scale.z
-				}
+		const root = editor.scene;
+		const verse = await this.write(root)
 
-				//meta.parameters.transform.active = node.visible
-				//(JSON.stringify(meta.parameters.transform.rotate))
-			}
-		})
-
-		window.URL = window.URL || window.webkitURL
-		window.BlobBuilder =
-			window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder
 		const data = {
-			from: 'mrpp-editor',
 			action: 'save-verse',
-			verse: JSON.stringify(self.verse)
+			data: JSON.stringify(verse)
 		}
-		console.error(data)
-		window.parent.postMessage(data, '*')
-		console.error(self.verse)
+
+		editor.signals.messageSend.dispatch(data)
 	}
 
+	this.compareObjectsAndPrintDifferences = function (obj1, obj2, path = '', tolerance = 0.0001) {
+		if (obj1 == null || obj2 == null) {
+			console.log('One of the objects is null');
+			return;
+		}
+		const keys1 = Object.keys(obj1);
+		const keys2 = Object.keys(obj2);
+
+		for (let key of keys1) {
+			const val1 = obj1[key];
+			const val2 = obj2[key];
+			const currentPath = path ? `${path}.${key}` : key;
+
+			if (typeof val1 === 'object' && typeof val2 === 'object') {
+
+				self.compareObjectsAndPrintDifferences(val1, val2, currentPath);
+			} else if (typeof val1 === 'number' && typeof val2 === 'number') {
+				if (Math.abs(val1 - val2) > tolerance) {
+					console.log(`Difference found at: "${currentPath}":`);
+					console.log(`Object 1: ${val1}`);
+					console.log(`Object 2: ${val2}`);
+				}
+			} else if (val1 !== val2) {
+				console.log(`Difference found at, ${currentPath}:`);
+				console.log(`Object 1: ${val1}`);
+				console.log(`Object 2: ${val2}`);
+			}
+		}
+
+		// Check for keys present in obj2 but not in obj1
+		for (let key of keys2) {
+			if (!keys1.includes(key)) {
+				const currentPath = path ? `${path}.${key}` : key;
+				console.log(`Key ${currentPath} present in Object 2 but not in Object 1`);
+			}
+		}
+	}
+	/*
 	this.loadIt = async function () {
-		let space = editor.objectByUuid(this.data.space.mesh.md5)
-		if (typeof space === 'undefined') {
+		if (this.data.space) {
 			space = await self.loadSpace(this.data.space)
 			builder.lockNode(space)
-			this.room.add(space)
+			editor.scene.add(space)
 		}
-	}
 
-	this.loadDatas = async function () {
-		let knights = new Map()
 
-		this.data.datas.knights.forEach(m => {
-			knights.set(m.id, m)
-		})
+	}*/
+	this.writeData = function (node) {
 
-		let metas = new Map()
-		this.data.datas.metas.forEach(m => {
-			metas.set(m.id, JSON.parse(m.data))
-		})
+		if (!types.includes(node.type)) {
+			return null;
+		}
+		const data = {}
 
-		let resources = new Map()
-		this.data.resources.forEach(r => {
-			resources.set(r.id, r)
-		})
-		this.verse.children.metas.forEach(async meta => {
-			if (meta.type == 'Meta' && metas.has(meta.parameters.id)) {
-				const data = metas.get(meta.parameters.id)
-				if (data !== null) {
-					await self.addMeta(meta, data, resources)
-				}
-			} else if (meta.type == 'Knight' && knights.has(meta.parameters.id)) {
-				const data = knights.get(meta.parameters.id)
-				if (data !== null && data.data !== null) {
-					await self.addKnight(meta, data)
-				}
+		data.type = node.type
+
+
+		data.parameters = {}
+		data.parameters.uuid = node.uuid
+		data.parameters.title = node.name
+		data.parameters.transform = {}
+		data.parameters.transform.position = {
+			x: node.position.x,
+			y: node.position.y,
+			z: node.position.z
+		}
+		data.parameters.transform.rotate = {
+			x: (node.rotation.x / Math.PI) * 180,
+			y: (node.rotation.y / Math.PI) * 180,
+			z: (node.rotation.z / Math.PI) * 180
+		};
+		data.parameters.transform.scale = {
+			x: node.scale.x,
+			y: node.scale.y,
+			z: node.scale.z
+		};
+		const exclude = ['type', 'draggable', 'custom']
+
+		Object.keys(node.userData).forEach(key => {
+			if (!exclude.includes(key)) {
+				data.parameters[key] = node.userData[key]
 			}
 		})
+		//entity.parameters.transform.active = true
+		//data.parameters.active = node.visible;
+		return data;
 	}
-	this.removeNode = async function (oldValue, newValue) {
-		const oldMetas = oldValue.children.metas
-		const newMetas = newValue.children.metas
 
-		let metas = new Set()
-		newMetas.forEach(meta => {
-			metas.add(meta.parameters.uuid)
-		})
-		oldMetas.forEach(meta => {
-			if (!metas.has(meta.parameters.uuid)) {
-				const obj = editor.objectByUuid(meta.parameters.uuid)
-				if (typeof obj !== 'undefined') {
-					editor.removeObject(obj)
+	this.write = async function (root) {
+
+		const data = {}
+		data.type = "Verse"
+		data.parameters = { "uuid": root.uuid }
+		data.parameters.space = { "id": -1, "occlusion": false }
+		data.parameters.story = "{\"sorted\":[110],\"contactor\":false}"
+
+		const modules = []
+
+		root.children.forEach(node => {
+
+			const nd = this.writeData(node)
+			if (nd != null) {
+				if (node.type == 'Module') {
+					modules.push(nd)
 				}
 			}
+
+
 		})
+		data.children = { modules }
+		console.error(data)
+		return data;
+	}
+
+	this.read = async function (root, data, resources, metas) {
+		root.uuid = data.parameters.uuid
+		if (data.children.anchors) {
+			data.children.anchors.forEach(async item => {
+				await self.addAnchor(item, root)
+			})
+		}
+
+		if (data.children.modules) {
+			data.children.modules.forEach(async item => {
+
+				const meta = metas.get(item.parameters.meta_id)
+
+				const node = factory.addModule(item)
+
+				node.userData.custom = meta.custom
+				root.add(node)
+				editor.signals.sceneGraphChanged.dispatch()
+				if (meta && meta.data && meta.custom != 0) {
+					await factory.readMeta(node, JSON.parse(meta.data), resources)
+					editor.signals.sceneGraphChanged.dispatch()
+
+				}
+				await factory.addGizmo(node)
+				editor.signals.sceneGraphChanged.dispatch()
+
+			})
+		}
+
 	}
 	this.clear = async function () {
 		this.scene.clear()
 	}
-	this.load = async function (data) {
-		if (typeof this.room === 'undefined') {
-			this.room = await builder.loadRoom()
-			builder.lockNode(this.room)
-			editor.addObject(this.room)
+	this.load = async function (verse) {
+
+		let scene = editor.scene;
+		if (scene == null) {
+			scene = new THREE.Scene();
+			scene.name = "Scene"
+			editor.setScene(scene)
 		}
-		if (data.data !== null) {
-			this.data = data
-			if (typeof this.verse === 'undefined') {
-				this.verse = JSON.parse(data.data)
-			} else {
-				const verse = JSON.parse(data.data)
-				await this.removeNode(this.verse, verse)
-				this.verse = verse
+
+		editor.signals.sceneGraphChanged.dispatch()
+		let lights = editor.scene.getObjectByName("$lights")
+		if (lights == null) {
+			lights = new THREE.Group();
+			lights.name = "$lights";
+			const light1 = new THREE.DirectionalLight(0xffffff, 0.5)
+			light1.position.set(-0.5, 0, 0.7)
+			light1.name = "light1"
+			lights.add(light1);
+			const light2 = new THREE.AmbientLight(0xffffff, 0.5)
+
+			light2.name = "light2"
+			lights.add(light2);
+			const light3 = new THREE.PointLight(0xffffff, 1)
+			light3.position.set(0, 0, 0)
+			light3.name = "light3"
+			lights.add(light3);
+			scene.add(lights)
+			factory.lockNode(lights)
+			editor.signals.sceneGraphChanged.dispatch()
+		}
+
+		let root = editor.scene;
+
+
+		if (verse.data !== null) {
+			const data = JSON.parse(verse.data)
+			if (typeof self.data !== 'undefined') {
+				await this.removeNode(self.data, data)
 			}
-			self.loadDatas()
-			self.loadIt()
+
+			const resources = new Map()
+			verse.resources.forEach(item => {
+				resources.set(item.id, item)
+			})
+			const metas = new Map()
+			console.error(verse)
+			verse.metas.forEach(item => {
+				metas.set(item.id, item)
+			})
+			await this.read(root, data, resources, metas)
+			const copy = await this.write(root);
+
+			self.compareObjectsAndPrintDifferences(data, copy)
+			editor.signals.sceneGraphChanged.dispatch()
 		}
+
+
+
 		editor.signals.sceneGraphChanged.dispatch()
 	}
 }

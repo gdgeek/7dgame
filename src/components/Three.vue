@@ -23,6 +23,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 
+import { isHttps,  convertToHttps} from '@/assets/js/helper'
 function toFixedVector3(vec, n) {
   const result = new Vector3()
   result.x = parseFloat(vec.x.toFixed(n))
@@ -89,12 +90,9 @@ export default {
 
     const light = new DirectionalLight(0xffffff, 1)
     light.position.set(-0.5, 0, 0.7)
-
-    //let l = await this.light();
     self.scene.add(light)
     self.scene.add(new PointLight(0xffffff, 3))
-    const ambient = new AmbientLight(0xffffff, 1)
-    self.scene.add(ambient)
+    self.scene.add(new AmbientLight(0xffffff, 1))
 
     function animate() {
       requestAnimationFrame(animate)
@@ -131,60 +129,6 @@ export default {
         }
       })
     },
-    async light() {
-      // alert(12222)
-      /*
-      const light = {
-        metadata: {
-          version: 4.5,
-          type: 'Object',
-          generator: 'Object3D.toJSON'
-        },
-        object: {
-          uuid: '10331223-0128-441b-b358-c3016a6ecc2f',
-          type: 'Group',
-          name: 'Room',
-          layers: 1,
-          matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-          children: [
-            {
-              uuid: 'f4c131be-dac2-4a72-8e72-fbabc4e430bb',
-              type: 'PointLight',
-              name: 'PointLight',
-              layers: 1,
-              matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-              color: 16777215,
-              intensity: 1,
-              distance: 0,
-              decay: 1
-            },
-            {
-              uuid: '9d42f72e-d9f3-4f4b-beff-069ab0922a89',
-              type: 'DirectionalLight',
-              name: 'DirectionalLight',
-              layers: 1,
-              matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 5, 10, 7.5, 1],
-              color: 16777215,
-              intensity: 1
-            },
-            {
-              uuid: '8b6b5b36-c5ed-4c21-9453-a8dd04ca53fe',
-              type: 'AmbientLight',
-              name: 'AmbientLight',
-              layers: 1,
-              matrix: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-              color: 2236962,
-              intensity: 2
-            }
-          ]
-        }
-      }
-
-      let node = await this.parseNode(light)
-
-      return node
-      */
-    },
     screenshot() {
       return new Promise((resolve, reject) => {
         const self = this
@@ -209,6 +153,7 @@ export default {
         }, 'image/jpeg')
       })
     },
+    
     refresh() {
       const self = this
 
@@ -217,9 +162,12 @@ export default {
         dracoLoader.setDecoderPath('/three.js/examples/js/libs/draco/')
         const gltf = new GLTFLoader()
         gltf.setDRACOLoader(dracoLoader)
-        //loader.preload()
+        let url = self.file.url
+      
+        url = convertToHttps(url)
+     
         gltf.load(
-          self.file.url,
+          url,
           // called when the resource is loaded
           function (model) {
             const box = new Box3().setFromObject(model.scene)

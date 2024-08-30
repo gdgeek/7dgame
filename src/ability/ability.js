@@ -6,14 +6,21 @@ export class AbilityRouter {
     this.path = path
   }
 }
-export class AbilityShare {
-  constructor(share) {
-    this.share = share
+
+export class AbilityEditable {
+  constructor(editable) {
+    this.editable = editable
+  }
+}
+export class AbilityViewable {
+  constructor(viewable) {
+    this.viewable = viewable
   }
 }
 export class AbilityWorks {
   constructor(id) {
     this.id = id
+    //
   }
 }
 
@@ -36,6 +43,7 @@ export function UpdateAbility($ability, roles, userId) {
     '/site',
     '/site/logout',
     '/site/index',
+    '/site/download',
     '/site/wechat-signup',
     '/site/binded-email',
     '/404',
@@ -44,6 +52,9 @@ export function UpdateAbility($ability, roles, userId) {
   ])
   if (env.canWeb()) {
     router.push(/^\/web[\/]/)
+  }
+  if (env.canBlog()) {
+    router.push(/^\/blog[\/]/)
   }
 
   if (env.canSetup()) {
@@ -57,21 +68,25 @@ export function UpdateAbility($ability, roles, userId) {
   if (
     roles.find(role => role === 'root' || role === 'manager' || role === 'user')
   ) {
-    can(['share'], AbilityShare.name, { share: true })
+    can(['editable'], AbilityEditable.name, { editable: true })
+    can(['viewable'], AbilityViewable.name, { viewable: true })
+
     can(['update', 'delete'], AbilityWorks.name, { id: userId })
     can(['delete'], AbilityMessage.name, { id: userId, managed: 0 })
     can(['update'], AbilityMessage.name, { id: userId })
 
     router = router.concat([
       '/verse/rete-verse',
+      '/verse/verse-script',
+      '/verse/script',
       '/meta/rete-meta',
-      //'/verse/code',
-      '/meta/cyber'
+      '/meta/script'
     ])
     menu = menu.concat([
       '/site/logout',
       '/resource/',
       /^\/polygen[\/]/,
+      /^\/voxel[\/]/,
       /^\/space[\/]/,
       /^\/picture[\/]/,
       /^\/video[\/]/,
@@ -86,18 +101,22 @@ export function UpdateAbility($ability, roles, userId) {
       /^\/audio[\/]/
     ])
 
-    if (roles.find(role => role === 'root' || role === 'manager')) {
+    if (
+      roles.find(
+        role => role === 'root' || role === 'admin' || role === 'manager'
+      )
+    ) {
       can(['manager'])
-      can(['share'], AbilityShare.name)
+      can(['editable'], AbilityEditable.name)
+      can(['viewable'], AbilityViewable.name)
       can(['update', 'delete'], AbilityWorks.name)
       can(['delete'], AbilityMessage.name, { managed: 0 })
       can(['update'], AbilityMessage.name)
-
       menu = menu.concat(['/verse-share/open', /^\/trades[\/]/])
-
+      menu = menu.concat([/^\/manager[\/]/])
       if (roles.find(role => role === 'root')) {
         can(['root'])
-        menu = menu.concat([/^\/manager[\/]/])
+        // menu = menu.concat([/^\/knight[\/]/])
       }
     }
   }

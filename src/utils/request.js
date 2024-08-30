@@ -2,11 +2,11 @@ import axios from 'axios'
 import { Message } from 'element-ui'
 import { getToken, removeToken } from '@/utils/auth'
 
-import environment from '@/environment.js'
+import env from '@/environment.js'
 import router from '@/router'
 // create an axios instance
 const service = axios.create({
-  baseURL: environment.api, // url = base url + request url
+  baseURL: env.replaceIP(env.api), // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 20000 // request timeout
 })
@@ -14,7 +14,6 @@ const service = axios.create({
 // request interceptor
 service.interceptors.request.use(
   config => {
-    console.log(config)
     const token = getToken()
     if (token !== null) {
       //  const t = token + 'a'
@@ -45,6 +44,7 @@ service.interceptors.response.use(
     return response
   },
   error => {
+    console.error(error)
     if (
       (typeof error.response === 'undefined' &&
         error.message === 'Network Error') ||

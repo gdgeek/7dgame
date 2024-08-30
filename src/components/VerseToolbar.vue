@@ -14,14 +14,14 @@
       </el-button>
 
       <el-button
-        v-if="canSave"
+        v-if="saveable"
         type="plain"
         size="mini"
         icon="el-icon-edit"
         @click="changedWindow()"
       />
       <el-button
-        v-if="canDelete"
+        v-if="deleteable"
         type="plain"
         size="mini"
         icon="el-icon-delete"
@@ -37,7 +37,7 @@ import { mapState } from 'vuex'
 import { putVerse, deleteVerse } from '@/api/v1/verse'
 import MrPPVerseQrcode from '@/components/MrPP/MrPPQRCodeVerse.vue'
 
-import { AbilityWorks, AbilityShare } from '@/ability/ability'
+import { AbilityEditable } from '@/ability/ability'
 
 import MrPPVerseWindowCreate from '@/components/MrPP/MrPPVerseWindow/Create.vue'
 export default {
@@ -56,17 +56,17 @@ export default {
     return {}
   },
   computed: {
-    canDelete() {
-      const self = this
-      return self.$can('delete', new AbilityWorks(self.verse.author_id))
-    },
-    canSave() {
-      const self = this
-      //console.error(self.verse)
-      if (self.verse === null) {
+    deleteable() {
+      if (this.verse === null) {
         return false
       }
-      return self.$can('update', new AbilityWorks(self.verse.author_id))
+      return this.$can('editable', new AbilityEditable(this.verse.editable))
+    },
+    saveable() {
+      if (this.verse === null) {
+        return false
+      }
+      return this.$can('editable', new AbilityEditable(this.verse.editable))
     }
   },
   methods: {

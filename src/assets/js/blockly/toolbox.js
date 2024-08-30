@@ -10,9 +10,13 @@ import { TextCategory } from '@/assets/js/blockly/custom/text'
 import { EntityCategory } from '@/assets/js/blockly/custom/entity'
 import { PolygenCategory } from '@/assets/js/blockly/custom/polygen'
 import { DataCategory } from '@/assets/js/blockly/custom/data'
+import { MetaCategory } from '@/assets/js/blockly/custom/meta'
 import { TriggerCategory } from '@/assets/js/blockly/custom/trigger'
 import { ExecuteCategory } from '@/assets/js/blockly/custom/execute'
+import { TaskCategory } from '@/assets/js/blockly/custom/task'
+import { HelperCategory } from '@/assets/js/blockly/custom/helper/index'
 import { PictureCategory } from '@/assets/js/blockly/custom/picture'
+import { VoxelCategory } from '@/assets/js/blockly/custom/voxel'
 import { VideoCategory } from '@/assets/js/blockly/custom/video'
 import { SoundCategory } from '@/assets/js/blockly/custom/sound'
 
@@ -44,8 +48,10 @@ export default {
 
     sep,
     DataCategory,
+    MetaCategory,
     TriggerCategory,
     EventCategory,
+    TaskCategory,
     //ExecuteCategory,
     sep,
     EntityCategory,
@@ -54,6 +60,8 @@ export default {
     TextCategory,
     VideoCategory,
     SoundCategory,
+    VoxelCategory,
+    HelperCategory,
     sep,
 
     Variable,

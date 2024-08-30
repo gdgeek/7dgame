@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <el-card class="box-card">
       <div slot="header">
         <el-card shadow="hover" :body-style="{ padding: '0px' }">
@@ -11,7 +10,7 @@
             v-if="item.image === null"
             src="@/assets/image/none.png"
             style="width: 100%; height: 300px; object-fit: contain"
-          >
+          />
           <el-image
             v-else
             style="width: 100%; height: 300px"
@@ -22,12 +21,10 @@
         </el-card>
 
         <slot name="info" />
-
       </div>
       <div class="clearfix">
         <slot name="enter">入口</slot>
         <slot name="buttons" />
-
       </div>
       <div class="bottom clearfix" />
     </el-card>
@@ -35,7 +32,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'MrPPVerseCard',
   props: {
@@ -45,7 +41,6 @@ export default {
     }
   },
   created() {}
-
 }
 </script>
 
@@ -56,7 +51,7 @@ export default {
   color: #666;
 }
 .card-title {
-  white-space:nowrap;
+  white-space: nowrap;
   display: block;
   text-overflow: ellipsis;
   overflow: hidden;

@@ -20,7 +20,7 @@ const EntityCategory = {
   contents: [
     Entity.toolbox,
     //  LineExecute.toolbox,
-    //  TweenExecute.toolbox,
+    TweenExecute.toolbox,
     VisualExecute.toolbox,
     EntityExplode.toolbox,
     EntityUnxploded.toolbox
@@ -33,7 +33,7 @@ function RegisterData(data, parameters) {
 function EntityRegister(parameters) {
   RegisterData(Entity, parameters)
   // RegisterData(LineExecute, parameters)
-  // RegisterData(TweenExecute, parameters)
+  RegisterData(TweenExecute, parameters)
   RegisterData(VisualExecute, parameters)
   RegisterData(EntityExplode, parameters)
   RegisterData(EntityUnxploded, parameters)

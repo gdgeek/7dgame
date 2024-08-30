@@ -4,6 +4,11 @@
       <el-form-item :inline="true" class="el-form-item" label="场景">
         <div v-if="id === -1">
           <el-button @click="select()" size="mini">未指派</el-button>
+          <el-button
+                  @click="click()"
+                  size="mini"
+                  icon="el-icon-edit"
+                ></el-button>
         </div>
         <div v-else>
           <div v-if="item === null">
@@ -108,7 +113,7 @@ export default {
       })
     },
     select() {
-      this.root.openSpace(this.onSpace) //$store.commit('spaceCallback', this.onSpace)
+      this.root.openSpace({ value: this.value, callback: this.onSpace }) //$store.commit('spaceCallback', this.onSpace)
     },
 
     onSpace(data) {

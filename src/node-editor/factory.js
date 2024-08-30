@@ -4,10 +4,11 @@ export async function Build(editor, data, input = null) {
       resolve(null)
       return
     }
+    /*
     if (data.type === 'MetaKnight') {
       data.type = 'Knight'
     }
-
+*/
     const component = editor.getComponent(data.type)
 
     component

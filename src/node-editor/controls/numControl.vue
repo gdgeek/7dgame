@@ -23,7 +23,7 @@ export default {
   computed: {
     value: {
       get() {
-        return this.value_
+        return parseFloat(this.value_)
       },
       set(value) {
         this.value_ = value

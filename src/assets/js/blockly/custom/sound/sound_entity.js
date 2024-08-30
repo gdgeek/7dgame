@@ -47,7 +47,7 @@ const block = {
     const lua = function (block) {
       var dropdown = block.getFieldValue('Sound')
 
-      return [Helper.handler(index, dropdown), Blockly.Lua.ORDER_NONE]
+      return [Helper.handler(dropdown), Blockly.Lua.ORDER_NONE]
     }
     return lua
   },

@@ -25,7 +25,8 @@
 </template>
 
 <script>
-import { postFile } from '@/api/files'
+import { postFile } from '@/api/v1/files'
+
 import { mapState } from 'vuex'
 
 export default {
@@ -103,8 +104,8 @@ export default {
     },
 
     async saveFile(md5, extension, file, handler) {
-      // return
       const self = this
+
       return new Promise(async function (resolve, reject) {
         try {
           const data = {
@@ -117,16 +118,17 @@ export default {
           self.progress(1, 1)
 
           const response = await postFile(data)
-
           self.$emit('saveResource', data.filename, response.data.id, () => {
             self.progress(2, 1)
           })
+
           resolve()
         } catch (err) {
           reject(err)
         }
       })
     },
+
     async select() {
       const self = this
       const store = self.store
@@ -135,12 +137,10 @@ export default {
       const md5 = await store.fileMD5(file, function (p) {
         self.progress(p, 0)
       })
-      const handler = await store.storeHandler()
-      const ret = await store.fileHas(md5, file.extension, handler, self.dir)
+      const handler = await store.publicHandler()
+      const has = await store.fileHas(md5, file.extension, handler, self.dir)
 
-      if (ret !== null) {
-        await self.saveFile(ret.md5, ret.extension, file, handler)
-      } else {
+      if (!has) {
         await store.fileUpload(
           md5,
           file.extension,
@@ -151,8 +151,9 @@ export default {
           handler,
           self.dir
         )
-        await self.saveFile(md5, file.extension, file, handler)
       }
+
+      await self.saveFile(md5, file.extension, file, handler)
     }
   }
 }

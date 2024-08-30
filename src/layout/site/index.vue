@@ -4,6 +4,7 @@
       <horizontal v-if="!isMobile" />
       <vertical v-else :open-menu="openMenu" @selectedMenu="selectedMenu" />
     </div>
+
     <router-view class="background-screen-max" />
     <the-footer :maxwidth="true" />
   </div>

@@ -11,17 +11,12 @@ const block = {
   getBlockJson(parameters) {
     const json = {
       type: 'block_type',
-      message0: '播放音频 %1 独占 %2',
+      message0: '播放音频 %1',
       args0: [
         {
           type: 'input_value',
           name: 'sound',
           check: 'Sound'
-        },
-        {
-          type: 'field_checkbox',
-          name: 'occupy',
-          checked: true
         }
       ],
       previousStatement: null,
@@ -43,21 +38,15 @@ const block = {
   },
   getLua(parameters) {
     const lua = function (block) {
-      var value_sound = Blockly.Lua.valueToCode(
+      var sound = Blockly.Lua.valueToCode(
         block,
         'sound',
         Blockly.Lua.ORDER_NONE
       )
 
-      var checkbox_occupy = block.getFieldValue('occupy') === 'TRUE'
-      // TODO: Assemble Lua into code variable.
-      var code =
-        'CS.MLua.Sound.Play(' +
-        value_sound +
-        ', ' +
-        JSON.stringify(checkbox_occupy) +
-        ')\n'
-      return code
+
+      return '_G.sound.play(' + sound + ')\n'
+
     }
     return lua
   },

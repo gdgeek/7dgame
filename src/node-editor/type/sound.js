@@ -29,7 +29,7 @@ var SoundType = {
     },
     {
       type: 'resource',
-      key: 'sound',
+      key: 'resource',
       resource: 'audio',
       title: '音频',
       readonly: false

@@ -7,12 +7,12 @@ const block = {
   title: data.name,
   type: DataType.name,
   colour: DataType.colour,
-  getBlock: function ({}) {
+  getBlock: function ({ }) {
     const block = {
       init: function () {
         this.jsonInit({
           type: data.name,
-          message0: 'X %1 Y %2 X %3',
+          message0: 'X %1 Y %2 Z %3',
           args0: [
             {
               type: 'input_value',
@@ -40,7 +40,7 @@ const block = {
     }
     return block
   },
-  getLua({}) {
+  getLua({ }) {
     const lua = function (block) {
       var value_x = Blockly.Lua.valueToCode(
         block,

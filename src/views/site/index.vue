@@ -1,37 +1,51 @@
 <template>
-  <mr-p-p-site>
+  <site>
     <div class="module-head font-text">
       <h1 class="module-welcome">欢迎!</h1>
       <h4>准备好出发了么？</h4>
+      <br />
       <el-tabs v-model="activeName" type="border-card" @tab-click="handleClick">
         <el-tab-pane name="login" label="账户密码登录">
-          <mr-p-p-login>账户密码登录</mr-p-p-login>
+          <login>账户密码登录</login>
         </el-tab-pane>
         <el-tab-pane
           v-if="env.canRegister()"
           name="qrcode"
           label="微信扫码（登陆/注册）"
         >
-          <mr-p-p-qrcode :active="qrcode">微信扫码进入</mr-p-p-qrcode>
+          <qrcode :active="qrcode">微信扫码进入</qrcode>
         </el-tab-pane>
       </el-tabs>
+      <br />
+      <el-button
+        style="width: 100%"
+        @click="$router.push({ path: '/site/download' })"
+        size="mini"
+        v-if="!env.local()"
+      >
+        下载相关程序
+      </el-button>
+
+      <el-button style="width: 100%" @click="backend()" size="mini" v-else>
+        进入管理后台
+      </el-button>
     </div>
-  </mr-p-p-site>
+  </site>
 </template>
 
 <script>
 import '@/assets/font/font.css'
 import environment from '@/environment.js'
 // @ is an alias to /src
-import MrPPSite from '@/components/MrPP/MrPPSite'
-import MrPPLogin from '@/components/MrPP/MrPPLogin'
-import MrPPQrcode from '@/components/MrPP/MrPPQrcode'
+import Site from '@/components/MrPP/MrPPSite'
+import Login from '@/components/MrPP/MrPPLogin'
+import Qrcode from '@/components/MrPP/MrPPQrcode'
 export default {
   name: 'ModuleIndex',
   components: {
-    MrPPSite,
-    MrPPLogin,
-    MrPPQrcode
+    Site,
+    Login,
+    Qrcode
   },
   data() {
     return {
@@ -47,6 +61,9 @@ export default {
     }
   },
   methods: {
+    backend() {
+      window.open(this.env.url, '_blank')
+    },
     handleClick(tab, event) {
       console.log(this.activeName)
     }

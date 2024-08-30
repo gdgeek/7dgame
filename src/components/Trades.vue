@@ -34,7 +34,7 @@
           <el-button @click="dialogVisible = false">取 消</el-button>
         </span>
       </el-dialog>
-      <waterfall v-if="map" :options="{}">
+      <waterfall v-if="map" :options="{}" ref="waterfall">
         <!-- slice Control number of items -->
         <waterfall-item v-for="trade in map" :key="trade.id">
           <el-col style="width: 280px">

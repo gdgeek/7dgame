@@ -169,9 +169,9 @@ class GLTFLoader extends Loader {
 		this.manager.itemStart( url );
 
 		const _onError = function ( e ) {
-
+			
 			if ( onError ) {
-
+				
 				onError( e );
 
 			} else {

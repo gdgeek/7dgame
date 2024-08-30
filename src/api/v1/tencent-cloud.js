@@ -21,3 +21,11 @@ export function store() {
     method: 'get'
   })
 }
+
+export function cloud() {
+  const url = path.join('v1', 'tencent-clouds', 'cloud')
+  return request({
+    url,
+    method: 'get'
+  })
+}

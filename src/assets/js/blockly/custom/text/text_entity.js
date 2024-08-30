@@ -43,14 +43,12 @@ const block = {
     return data
   },
   getLua({ index }) {
-    // alert(index)
     const lua = function (block) {
       var dropdown_text = block.getFieldValue('Text')
-      //alert(dropdown_polygen);
       // TODO: Assemble Lua into code variable.
       // var code =
       // TODO: Change ORDER_NONE to the correct strength.
-      return [Helper.handler(index, dropdown_text), Blockly.Lua.ORDER_NONE]
+      return [Helper.handler(dropdown_text), Blockly.Lua.ORDER_NONE]
     }
     return lua
   },

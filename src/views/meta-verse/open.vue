@@ -7,7 +7,7 @@
 <script>
 import MrPPVersePage from '@/components/MrPP/MrPPVersePage.vue'
 
-import { getVersesOpens } from '@/api/v1/verse-open'
+import { getVerseOpenVerses } from '@/api/v1/verse-open'
 export default {
   name: 'VerseOpen',
   components: {
@@ -16,7 +16,7 @@ export default {
   methods: {
     async loaded(data, result) {
       try {
-        const response = await getVersesOpens(
+        const response = await getVerseOpenVerses(
           data.sorted,
           data.searched,
           data.current,

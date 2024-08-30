@@ -14,10 +14,9 @@ router.beforeEach(async (to, from, next) => {
   // start progress bar
   NProgress.start()
 
-  // alert(ability.can('goto', new AbilityRouter(to.path)))
   const token = getToken()
   const hasGetUserInfo = store.getters.userData !== null
-  // alert(token)
+
   if (token !== null && !hasGetUserInfo) {
     if (!ability.can('goto', new AbilityRouter(to.path))) {
       await store.dispatch('user/getUser')
@@ -29,10 +28,10 @@ router.beforeEach(async (to, from, next) => {
   } else {
     document.title = `${store.state.information.data.title}`
   }
-
   if (env.canSetup() && !to.path.includes('setup')) {
-    const result = await ready()
-    if (!result.data.result) {
+    const response = await ready()
+    const data = response.data
+    if (!data.result) {
       next(`/setup/index`)
       NProgress.done()
       return
@@ -44,6 +43,8 @@ router.beforeEach(async (to, from, next) => {
   } else {
     if (env.canWeb()) {
       next(`/web`)
+    } else if (env.canBlog()) {
+      next(`/blog`)
     } else {
       next(`/site`)
     }

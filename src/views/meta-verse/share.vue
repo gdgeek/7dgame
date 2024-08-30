@@ -7,7 +7,7 @@
 <script>
 import MrPPVersePage from '@/components/MrPP/MrPPVersePage.vue'
 
-import { getVerseShares } from '@/api/v1/verse-share'
+import { getVerseShareVerses } from '@/api/v1/verse-share'
 //import { getVersesWithShare } from '@/api/v1/verse'
 export default {
   name: 'VerseShare',
@@ -17,7 +17,7 @@ export default {
   methods: {
     async loaded(data, result) {
       try {
-        const response = await getVerseShares(
+        const response = await getVerseShareVerses(
           data.sorted,
           data.searched,
           data.current,

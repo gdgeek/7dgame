@@ -68,7 +68,7 @@
 <script>
 import env from '@/environment.js'
 
-import { signup } from '@/api/v1/local'
+import { init } from '@/api/v1/local'
 import { setToken } from '@/utils/auth'
 // @ is an alias to /src
 import MrPPSite from '@/components/MrPP/MrPPSite/setup'
@@ -137,15 +137,14 @@ export default {
   methods: {
     submit(formName) {
       const self = this
-      this.$refs[formName].validate(valid => {
+      this.$refs[formName].validate(async valid => {
         if (valid) {
-          signup({
+          const response = await init({
             username: self.form.username,
             password: self.form.password
-          }).then(response => {
-            setToken(response.data.access_token)
-            this.$router.push('/')
           })
+          setToken(response.data.access_token)
+          self.$router.push('/')
         } else {
           return false
         }

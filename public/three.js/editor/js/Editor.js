@@ -14,6 +14,7 @@ _DEFAULT_CAMERA.lookAt(new THREE.Vector3())
 function Editor() {
 	var Signal = signals.Signal
 
+	this.selector = null;
 	this.signals = {
 		upload: new Signal(),
 		// script
@@ -76,6 +77,17 @@ function Editor() {
 		scriptChanged: new Signal(),
 		scriptRemoved: new Signal(),
 
+
+		componentAdded: new Signal(),
+		componentChanged: new Signal(),
+		componentRemoved: new Signal(),
+
+
+		eventAdded: new Signal(),
+		eventChanged: new Signal(),
+		eventRemoved: new Signal(),
+
+
 		windowResize: new Signal(),
 
 		showGridChanged: new Signal(),
@@ -83,7 +95,10 @@ function Editor() {
 		refreshSidebarObject3D: new Signal(),
 		historyChanged: new Signal(),
 
-		viewportCameraChanged: new Signal()
+		viewportCameraChanged: new Signal(),
+
+		messageSend: new Signal(),
+		messageReceive: new Signal()
 	}
 
 	this.config = new Config()
@@ -413,10 +428,13 @@ Editor.prototype = {
 	//
 
 	select: function (object) {
-		if (
-			this.selected === object ||
-			(object !== null && typeof object.locked !== 'undefined' && object.locked)
-		) {
+		if (this.selector != null) {
+			while (object != null && !this.selector(object)) {
+				object = object.parent
+			}
+		}
+
+		if (this.selected === object) {
 			return
 		}
 

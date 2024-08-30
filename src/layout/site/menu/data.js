@@ -30,5 +30,13 @@ if (env.canWeb()) {
       text: '元宇宙医疗'
     }
   ]
+} else {
+  data = [
+    {
+      path: '/blog/index',
+      name: 'Index',
+      text: '开发博客'
+    }
+  ]
 }
 export default { data }

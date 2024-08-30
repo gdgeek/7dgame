@@ -13,7 +13,6 @@ export function verifEmail(token) {
     method: 'get'
   })
 }
-
 export function signup(info) {
   console.log(info)
   return request({

@@ -68,8 +68,9 @@
 </template>
 <script>
 import { getPolygen, putPolygen, deletePolygen } from '@/api/resources'
-import { createVerseFromPolygen } from '@/api/v1/meta-verse'
-import { postFile } from '@/api/files'
+import { createVerseFromResource } from '@/api/v1/meta-verse'
+
+import { postFile } from '@/api/v1/files'
 import { printVector3 } from '@/assets/js/helper'
 import { mapState } from 'vuex'
 import Three from '@/components/Three.vue'
@@ -160,36 +161,39 @@ export default {
     progress(percentage) {
       this.percentage = percentage
     },
-    createVerse: function () {
+    createVerse: async function () {
       const self = this
-      this.$prompt('用此模型创建【宇宙】', '提示', {
+      await this.$prompt('用此模型创建【宇宙】', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         inputValue: self.data.name,
         inputErrorMessage: '请填写相应名称'
       })
-        .then(({ value }) => {
+
+        .then(async ({ value }) => {
           self.loading = true
-          createVerseFromPolygen(value, this.data)
-            .then(data => {
-              self.loading = false
+          try {
+            const data = await createVerseFromResource(
+              'Polygen',
+              value,
+              self.data
+            )
 
-              this.$message({
-                type: 'success',
-                message: '你创建了新的场景: ' + value
-              })
-              setTimeout(() => {
-                this.$router.push('/meta-verse/index')
-              }, 300)
+            this.$message({
+              type: 'success',
+              message: '你创建了新的场景: ' + value
             })
-            .catch(error => {
-              self.loading = false
+            setTimeout(() => {
+              this.$router.push('/meta-verse/index')
+            }, 300)
+          } catch (error) {
+            this.$message({
+              type: 'error',
+              message: '创建失败: ' + error
+            })
+          }
 
-              this.$message({
-                type: 'error',
-                message: '创建失败: ' + error
-              })
-            })
+          self.loading = false
         })
         .catch(() => {
           this.$message({
@@ -220,18 +224,16 @@ export default {
           })
         })
     },
-    delete: function (id) {
-      const self = this
-      console.log(self.api + '/resources/' + id + '?type=polygen')
+    delete: async function (id) {
+      console.log(this.api + '/resources/' + id + '?type=polygen')
+      try {
+        await deletePolygen(id)
 
-      deletePolygen(id)
-        .then(response => {
-          self.$router.push({ path: '/polygen/index' })
-        })
-        .catch(function (error) {
-          console.log(error)
-          self.failed(JSON.parse(error.message))
-        })
+        this.$router.push({ path: '/polygen/index' })
+      } catch (err) {
+        console.error(err)
+        this.failed(JSON.parse(err.message))
+      }
     },
     namedWindow: function () {
       const self = this
@@ -255,45 +257,40 @@ export default {
           })
         })
     },
-    named: function (id, name) {
-      const self = this
+    named: async function (id, name) {
       const polygen = { name }
       console.log(polygen)
-      putPolygen(id, polygen)
-        .then(response => {
-          self.data.name = response.data.name
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      try {
+        const response = await putPolygen(id, polygen)
+        this.data.name = response.data.name
+      } catch (err) {
+        console.error(err)
+      }
     },
-    updatePolygen(imageId, info) {
-      const self = this
+    updatePolygen: async function (imageId, info) {
       const polygen = { image_id: imageId, info: JSON.stringify(info) }
-      putPolygen(this.data.id, polygen).then(response => {
-        console.log(response.data)
-        this.data.image_id = response.data.image_id
-        this.data.info = response.data.info
-        console.log(this.dataInfo)
-        console.log(self.meshCenter)
-        self.expire = false
-      })
+
+      const response = await putPolygen(this.data.id, polygen)
+      console.log(response.data)
+      this.data.image_id = response.data.image_id
+      this.data.info = response.data.info
+      console.log(this.dataInfo)
+      console.log(this.meshCenter)
+      this.expire = false
     },
-    saveFile(md5, extension, info, file, handler) {
-      const self = this
+    saveFile: async function (md5, extension, info, file, handler) {
       const data = {
         md5,
         key: md5 + extension,
         filename: file.name,
-        url: self.store.fileUrl(md5, extension, handler, 'screenshot/polygen')
+        url: this.store.fileUrl(md5, extension, handler, 'screenshot/polygen')
       }
 
-      postFile(data).then(response => {
-        // self.expire = false
-        self.updatePolygen(response.data.id, info)
-      })
+      const response = await postFile(data)
+      this.updatePolygen(response.data.id, info)
     },
-    async loaded(info) {
+    loaded: async function (info) {
+      console.error(info)
       const self = this
       const store = this.store
       if (self.prepare) {
@@ -306,18 +303,16 @@ export default {
       const file = blob
       const md5 = await store.fileMD5(file)
 
-      const handler = await store.storeHandler()
+      const handler = await store.publicHandler()
 
-      const ret = await store.fileHas(
+      const has = await store.fileHas(
         md5,
         file.extension,
         handler,
         'screenshot/polygen'
       )
-      if (ret !== null) {
-        self.saveFile(ret.md5, ret.extension, info, file, handler)
-      } else {
-        const r = store.fileUpload(
+      if (!has) {
+        await store.fileUpload(
           md5,
           file.extension,
           file,
@@ -325,11 +320,12 @@ export default {
           handler,
           'screenshot/polygen'
         )
-        self.saveFile(md5, file.extension, info, file, handler)
       }
+
+      await self.saveFile(md5, file.extension, info, file, handler)
     },
 
-    screenshot() {
+    screenshot: function () {
       return this.$refs.three.screenshot()
     }
   }

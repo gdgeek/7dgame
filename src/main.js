@@ -1,9 +1,9 @@
 import Vue from 'vue'
-import "babel-polyfill"
+import 'babel-polyfill'
 import VueCookies from 'vue-cookies'
 
 import ability from './ability'
-
+import VueForm from '@lljj/vue-json-schema-form'
 import VueIframe from 'vue-iframes'
 import vueHljs from 'vue-hljs'
 import hljs from 'highlight.js'
@@ -46,6 +46,7 @@ Vue.use(ElementUI, { locale })
 // Vue.use(ElementUI)
 Vue.config.productionTip = false
 
+Vue.component('VueForm', VueForm)
 new Vue({
   el: '#app',
   router,

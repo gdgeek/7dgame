@@ -11,12 +11,17 @@ const block = {
   getBlockJson(parameters) {
     const json = {
       type: 'block_type',
-      message0: '播放视频 %1 独占 %2',
+      message0: '播放视频 %1 同步 %2 独占 %3',
       args0: [
         {
           type: 'input_value',
           name: 'video',
           check: 'Video'
+        },
+        {
+          type: 'field_checkbox',
+          name: 'sync',
+          checked: true
         },
         {
           type: 'field_checkbox',
@@ -43,19 +48,21 @@ const block = {
   },
   getLua(parameters) {
     const lua = function (block) {
-      var value_video = Blockly.Lua.valueToCode(
+      var video = Blockly.Lua.valueToCode(
         block,
         'video',
         Blockly.Lua.ORDER_NONE
       )
-      var checkbox_occupy = block.getFieldValue('occupy') === 'TRUE'
-      return (
-        'CS.MLua.Video.Play(' +
-        value_video +
-        ', ' +
-        JSON.stringify(checkbox_occupy) +
-        ')\n'
-      )
+      var sync = block.getFieldValue('sync') === 'TRUE'
+      var occupy = block.getFieldValue('occupy') === 'TRUE'
+
+      var parameter = video + ', ' + JSON.stringify(occupy)
+
+      if (sync) {
+        return '_G.video.sync_play(' + parameter + ')\n'
+      } else {
+        return '_G.video.play(' + parameter + ')\n'
+      }
     }
     return lua
   },

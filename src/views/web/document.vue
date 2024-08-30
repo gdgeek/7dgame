@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-card class="card">
-      <document :post-id="id" />
+      <document :post-id="id" :category_path="category_path" />
     </el-card>
   </div>
 </template>
@@ -11,6 +11,12 @@ import Document from '@/components/Document.vue'
 // @ is an alias to /src
 export default {
   name: 'WebDocument',
+  props: {
+    category_path: {
+      type: String,
+      default: '/web/category'
+    }
+  },
   components: {
     Document
   },

@@ -22,8 +22,8 @@
       </el-form-item>
 
       <el-form-item class="login-button">
-        <el-button style="width: 120px" type="primary" @click="submit('form')">
-          登陆
+        <el-button style="width: 100%" type="primary" @click="submit('form')">
+          登陆平台
         </el-button>
       </el-form-item>
     </el-form>

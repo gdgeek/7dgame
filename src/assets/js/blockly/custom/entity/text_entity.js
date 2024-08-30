@@ -21,7 +21,6 @@ const block = {
             const text = resource.text
             let opt = [['none', '']]
             text.forEach(t => {
-              // alert(poly.name)
               opt.push([t.name, t.uuid])
             })
             return opt
@@ -47,11 +46,10 @@ const block = {
   getLua(index) {
     const lua = function (block) {
       var dropdown = block.getFieldValue('Text')
-      //alert(dropdown_picture);
       // TODO: Assemble Lua into code variable.
       // var code = "CS.MLua.Handler('" + index + "', '" + dropdown_text + "')"
       // TODO: Change ORDER_NONE to the correct strength.
-      return [Helper.handler(index, dropdown), Blockly.Lua.ORDER_NONE]
+      return [Helper.handler(dropdown), Blockly.Lua.ORDER_NONE]
     }
     return lua
   },

@@ -53,7 +53,6 @@ import { Waterfall, WaterfallItem } from 'vue2-waterfall'
 
 import VerseToolbar from '@/components/VerseToolbar.vue'
 import InfoContent from '@/components/InfoContent.vue'
-import { mapState } from 'vuex'
 
 export default {
   name: 'MrPPVerseList',

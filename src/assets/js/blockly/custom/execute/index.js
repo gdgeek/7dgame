@@ -10,13 +10,7 @@ const ExecuteCategory = {
   kind: 'category',
   name: '可执行',
   colour: Type.colour,
-  contents: [
-    BoomExecute.toolbox,
-    FunctionExecute.toolbox
-    // LineExecute.toolbox,
-    //  TweenExecute.toolbox,
-    // VisualExecute.toolbox
-  ]
+  contents: [BoomExecute.toolbox, FunctionExecute.toolbox]
 }
 function RegisterData(data, parameters) {
   Blockly.Blocks[data.title] = data.getBlock(parameters)

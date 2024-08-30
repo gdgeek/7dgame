@@ -1,16 +1,18 @@
 <template>
   <!-- 应用场景组件 -->
-  <section class="section-box font-text">
+  <section class="section-box">
     <el-row :gutter="30" class="p-pc-pfr">
       <!-- content部分 -->
       <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12" align="left">
-        <div class="title-box">
-          <h2 class="medical-title-h3 p-title-m">医疗核心应用场景</h2>
-          <div class="medical-title-small">
+        <div class="title-box content-color">
+          <h1 class="public-title-margin p-title-m medical-color">
+            医疗核心应用场景
+          </h1>
+          <h4>
             <!-- 具有数字沙盘、实现AR实景展示、网站增强现实3D效果呈现、AR产品互动营销等AR营销方式 -->
             私有部署方案，可实现AR实景展示、多设备数字可视化协同
-          </div>
-          <h5>
+          </h4>
+          <h5 style="line-height: 1.4; letter-spacing: 1px">
             元宇宙实景编程平台（MrPP.com），
             是一个让任何人都可以轻松创建AR场景的创作平台，支持可视化编程，三方视角（观众视角），空间场景定位等有趣的功能。给用户提供强大的编辑能力，让用户可以随时随地创造有趣的AR协同场景。
             <br />
@@ -41,6 +43,7 @@
 </template>
 
 <script>
+import '@/assets/font/font.css'
 export default {
   name: 'MedicalVideo',
   data() {
@@ -56,29 +59,10 @@ export default {
   padding: 8% 20px 6%;
 }
 .title-box {
-  margin: 2% 0 2% 4%;
-  max-width: 530px;
+  margin: 2% 4%;
+  max-width: 570px;
 }
-
-.medical-title-h3 {
-  font-size: 32px;
-  font-weight: 400;
-  color: #00cccc;
-}
-.medical-title-small {
-  color: #5a5a5b;
-  // color: #929292;
-  font-weight: lighter;
-  padding: 10px 0 10px;
-  font-size: 16px;
-}
-.medical-content-small {
-  color: #444850;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 24px;
-}
-.videobox {
+.video-box {
   background-color: rgb(190, 232, 235);
   height: 400px;
 }

@@ -78,7 +78,6 @@ export default {
       )
       const first = matched[0]
 
-      // alert()
       if (!this.isDashboard(first)) {
         matched = [
           { path: '/', meta: { title: this.information.data.title } }

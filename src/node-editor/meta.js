@@ -28,7 +28,8 @@ import {
   Action,
   Tooltip,
   Billboard,
-  Moved
+  Moved,
+  Voxel
 } from './type/metaEditor'
 
 let editor_ = null
@@ -47,7 +48,6 @@ const save = async function () {
   editor_.trigger('process', { status: 'save' })
 }*/
 const arrange = function () {
-  console.log(editor_.nodes.length)
   if (editor_.nodes.length > 0) {
     editor_.trigger('arrange', editor_.nodes)
   }
@@ -56,8 +56,6 @@ const ban = function () {
   editor_.use(BanPlugin)
 }
 const create = function (meta) {
-  //alert(JSON.stringify(meta))
-
   const data = {
     type: 'MetaRoot',
     parameters: {
@@ -82,6 +80,7 @@ const setup = async function (data) {
     arrange()
     editor_.view.resize()
     AreaPlugin.zoomAt(editor_)
+    editor_.silent = false
   }, 250)
 }
 
@@ -91,6 +90,7 @@ const initMeta = async function ({ container, root }) {
     Entity,
     Polygen,
     Picture,
+    Voxel,
     Video,
     Sound,
     Text,
@@ -130,6 +130,7 @@ const initMeta = async function ({ container, root }) {
     { component: 'Polygen', target: 'name' },
     { component: 'Video', target: 'name' },
     { component: 'Picture', target: 'name' },
+    { component: 'Voxel', target: 'name' },
     { component: 'Sound', target: 'name' },
     { component: 'Text', target: 'name' },
     { component: 'Text', target: 'text' },
@@ -145,11 +146,13 @@ const initMeta = async function ({ container, root }) {
     { component: 'Video', target: 'uuid' },
     { component: 'Picture', target: 'uuid' },
     { component: 'Sound', target: 'uuid' },
+    { component: 'Voxel', target: 'uuid' },
     { component: 'Text', target: 'uuid' },
     { component: 'Entity', target: 'uuid' },
     { component: 'Button', target: 'uuid' },
     { component: 'Action', target: 'uuid' },
-    { component: 'Tooltip', target: 'uuid' }
+    { component: 'Tooltip', target: 'uuid' },
+    { component: 'Moved', target: 'uuid' }
   ])
 
   engine_ = new Rete.Engine('MrPP@0.1.0')
@@ -163,7 +166,6 @@ const initMeta = async function ({ container, root }) {
   editor_.on('process', async e => {
     if (typeof e === 'object' && typeof e.status === 'string') {
       if (e.status === 'save') {
-        // alert(e.status)
         await engine_.abort()
         await root.save()
         /*

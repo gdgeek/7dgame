@@ -7,6 +7,7 @@ import billboard from '@/node-editor/type/components/billboard'
 import moved from '@/node-editor/type/components/moved'
 import video from '@/node-editor/type/video'
 import sound from '@/node-editor/type/sound'
+import voxel from '@/node-editor/type/voxel'
 import entity from '@/node-editor/type/entity'
 import transparent from '@/node-editor/type/components/transparent'
 import lockedScale from '@/node-editor/type/components/lockedScale'
@@ -22,6 +23,7 @@ export const Video = video
 export const Sound = sound
 export const Text = text
 export const Entity = entity
+export const Voxel = voxel
 export const Transparent = transparent
 export const Rotate = rotate
 export const LockedScale = lockedScale

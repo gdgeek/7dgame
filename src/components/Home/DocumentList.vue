@@ -46,7 +46,7 @@
       </el-timeline-item>
     </el-timeline>
     <el-pagination
-      v-if="pagination.count>1"
+      v-if="pagination.count > 1"
       :current-page="pagination.current"
       :page-count="pagination.count"
       :page-size="pagination.size"
@@ -69,7 +69,7 @@ export default {
       type: Number,
       required: true
     },
-    path: {
+    document_path: {
       type: String,
       default: '/home/document'
     }
@@ -116,8 +116,7 @@ export default {
       return moment(date).format('YYYY-MM-DD HH:mm:ss')
     },
     select(id) {
-      const self = this
-      self.$router.push({ path: self.path, query: { id } })
+      this.$router.push({ path: this.document_path, query: { id } })
     }
   }
 }
@@ -127,7 +126,7 @@ export default {
 .document-box-card {
   cursor: pointer;
   margin: 0px;
-  
+
   // outline: dashed 1px black;
   /* Setup */
   //position: relative;

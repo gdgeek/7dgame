@@ -2,7 +2,7 @@ import { ComponentSocket } from '@/node-editor/sockets/sockets'
 
 var MovedType = {
   title: 'Moved',
-  allocate: ['高级组件'],
+  allocate: ['组件'],
   controls: [
     {
       type: 'uuid',

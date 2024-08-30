@@ -1,11 +1,9 @@
 <template>
   <!-- 开发流程板块 -->
-  <section class="sandtable-section font-text">
+  <section class="sandtable-section">
     <div align="center">
-      <h1 style="color: #4183ea" class="section-title-size">项目开发流程</h1>
-      <p class="f-text-color">
-        专注开发效率和用户体验，不断优化流程、提升项目质量
-      </p>
+      <h1 class="p-title-m" style="color: #4183ea">项目开发流程</h1>
+      <h4>专注开发效率和用户体验，不断优化流程、提升项目质量</h4>
       <p class="section-underline-style" />
     </div>
 
@@ -18,10 +16,10 @@
             class="section-radius"
           >
             <img src="/media/bg/business3.jpg" style="width: 100%" />
-            <p style="color: #489ddb; font-size: 15px; padding-top: 20px">
+            <h4 style="padding-top: 20px">
               我们拥有超过100个HoloLens
               项目开发的经验,丰富的经验和资源让我们在开发过程中可以避开误区，有效节约成本，优化流程效率，客户满意度更高！
-            </p>
+            </h4>
           </div>
           <br />
         </el-col>
@@ -82,7 +80,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/styles/screenstyle.scss';
+@import '~@/styles/responsive-style.scss';
 @import '~@/styles/sandtable.scss';
 .timeline-content {
   background-color: #f8f8f8;

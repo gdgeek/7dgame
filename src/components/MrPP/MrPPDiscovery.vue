@@ -275,8 +275,6 @@ export default {
     select(id) {
       const self = this
       Article(id).then(r => {
-        // console.error(r.data)
-        // alert(JSON.stringify(r.data))
         self.article = {
           title: r.data.title.rendered,
           content: r.data.content.rendered

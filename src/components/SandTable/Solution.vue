@@ -4,12 +4,10 @@
     <section class="sandtable-section section-bgc-color">
       <br />
       <div align="center">
-        <h1 class="section-title-size section-title-dark font-text">
-          虚实结合，震撼数字沙盘解决方案
-        </h1>
-        <p class="f-text-color font-text">
+        <h1 class="p-title-m">虚实结合，震撼数字沙盘解决方案</h1>
+        <h4>
           我们致力于扎根行业、深入场景进行产品设计和创新，为用户构建端到端的沙盘解决方案
-        </p>
+        </h4>
         <p class="section-underline-style" />
       </div>
       <el-row :gutter="30" class="section-card-padding">
@@ -56,6 +54,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import '~@/styles/screenstyle.scss';
+@import '~@/styles/responsive-style.scss';
 @import '~@/styles/sandtable.scss';
+.section-card-padding {
+  padding: 4%;
+}
 </style>

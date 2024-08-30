@@ -3,7 +3,9 @@ import { NumControl } from '../controls/numControl.js'
 import { NumSocket } from '../sockets/sockets'
 
 export class NumComponent extends Rete.Component {
-  constructor() { super('Number') }
+  constructor() {
+    super('Number')
+  }
 
   builder(node) {
     var out1 = new Rete.Output('num', 'Number', NumSocket)
@@ -11,7 +13,6 @@ export class NumComponent extends Rete.Component {
   }
 
   worker(node, inputs, outputs) {
-  //  alert(5)
     outputs['num'] = node.data.num
   }
 }

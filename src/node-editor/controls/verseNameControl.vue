@@ -1,7 +1,7 @@
 <template>
   <el-form :inline="true" size="mini">
     <el-form-item class="el-form-item" :inline="true" label="名称">
-      <el-tag size="small" v-if="root.canSave" @click="changeVerseName()">
+      <el-tag size="small" v-if="root.saveable" @click="changeVerseName()">
         {{ value.name }}
       </el-tag>
       <el-tag size="small" v-else>
@@ -45,14 +45,14 @@ export default {
       const id = this.root.verse.id
       const self = this
       try {
-        const r = await this.$prompt('请输入新的名称', '修改【宇宙】名称', {
+        const input = await this.$prompt('请输入新的名称', '修改【宇宙】名称', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           closeOnClickModal: false,
           inputValue: self.value.name
         })
 
-        await putVerse(id, { name: r.value })
+        await putVerse(id, { name: input.value })
         self.value.name = r.value
         this.root._setVerseName(r.value)
         this.$message({

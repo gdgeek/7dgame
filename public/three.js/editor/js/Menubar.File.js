@@ -30,11 +30,11 @@ function MenubarFile(editor) {
 			editor.clear()
 		}
 	})
-	options.add(option)
+	//options.add(option)
 
 	//
 
-	options.add(new UIHorizontalRule())
+	//options.add(new UIHorizontalRule())
 
 	// Import
 
@@ -57,11 +57,11 @@ function MenubarFile(editor) {
 	option.onClick(function () {
 		fileInput.click()
 	})
-	options.add(option)
+	//options.add(option)
 
 	//
 
-	options.add(new UIHorizontalRule())
+	//options.add(new UIHorizontalRule())
 
 	// SAVE
 	option = new UIRow()
@@ -445,7 +445,7 @@ function MenubarFile(editor) {
 			toZip['js/VRButton.js'] = strToU8(content)
 		})
 	})
-	options.add(option)
+	//options.add(option)
 
 	const link = document.createElement('a')
 	function save(blob, filename) {

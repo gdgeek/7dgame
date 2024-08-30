@@ -7,7 +7,7 @@ import { SetGeometryCommand } from './commands/SetGeometryCommand.js';
 function GeometryParametersPanel( editor, object ) {
 
 	const strings = editor.strings;
-
+ 
 	const container = new UIDiv();
 
 	const geometry = object.geometry;

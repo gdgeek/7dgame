@@ -10,7 +10,7 @@
       accept="image/jpeg,image/gif,image/png,image/bmp"
       style="float: left"
     >
-      <img v-if="showImage" :src="showImage" class="file" />
+      <img v-if="url" :src="url" class="file" />
       <i v-else class="el-icon-plus file-uploader-icon" />
     </el-upload>
 
@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { postFile } from '@/api/files'
+import { postFile } from '@/api/v1/files'
 
 import { mapState } from 'vuex'
 export default {
@@ -136,14 +136,11 @@ export default {
   computed: {
     ...mapState({
       store: state => state.config.store
-    }),
-    showImage() {
-      return this.url
-    }
+    })
   },
   methods: {
-    setImageUrl(imageUrl) {
-      this.url = imageUrl
+    setImageUrl(url) {
+      this.url = url
     },
     // 头像上传方法开始
     // 上传按钮 限制图片大小和类型
@@ -212,26 +209,21 @@ export default {
       // let cropAxis = [data.axis.x1, data.axis.y1, data.axis.x2, data.axis.y2]
       // console.log(cropAxis)
     },
-    saveFile(md5, extension, file, handler) {
-      const self = this
-      const url = self.store.fileUrl(md5, extension, handler, 'backup')
-
-      self.url = url
+    async saveFile(md5, extension, file, handler) {
       const data = {
         filename: file.name,
         md5,
         key: md5 + extension,
-        url
+        url: this.store.fileUrl(md5, extension, handler, 'backup')
       }
-
-      postFile(data)
-        .then(response => {
-          self.$emit('saveFile', response.data.id)
-        })
-        .catch(err => {
-          self.loading = false
-          console.log(err)
-        })
+      this.url = data.url
+      try {
+        const response = await postFile(data)
+        this.$emit('saveFile', response.data.id)
+      } catch (err) {
+        console.log(err)
+      }
+      this.loading = false
     },
     async finish() {
       const self = this
@@ -243,12 +235,10 @@ export default {
         const file = blob
         const md5 = await store.fileMD5(file)
 
-        const handler = await store.storeHandler()
-        const ret = await store.fileHas(md5, file.extension, handler, 'backup')
-        if (ret !== null) {
-          self.saveFile(ret.md5, ret.extension, file, handler)
-        } else {
-          const r = await store.fileUpload(
+        const handler = await store.publicHandler()
+        const has = await store.fileHas(md5, file.extension, handler, 'backup')
+        if (!has) {
+          await store.fileUpload(
             md5,
             file.extension,
             file,
@@ -256,8 +246,9 @@ export default {
             handler,
             'backup'
           )
-          self.saveFile(md5, file.extension, file, handler)
         }
+
+        await self.saveFile(md5, file.extension, file, handler)
 
         this.dialogVisible = false
         this.loading = true

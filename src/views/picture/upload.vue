@@ -29,12 +29,13 @@ export default {
       const self = this
       try {
         const response = await postPicture({ name, file_id })
+
         self.$router.push({
           path: '/picture/view',
           query: { id: response.data.id }
         })
       } catch (err) {
-        alert(err)
+        console.error(err)
       }
       callback()
     }

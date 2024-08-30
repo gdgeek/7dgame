@@ -1,5 +1,5 @@
 <template>
-  <el-form :inline="true" size="mini">
+  <el-form :hidden="hidden" :inline="true" size="mini">
     <el-form-item class="el-form-item" :inline="true" :label="data.title">
       <el-input v-model="value" :readonly="data.readonly" />
     </el-form-item>
@@ -16,14 +16,6 @@ export default {
     }
   },
   computed: {
-    test: {
-      get() {
-        return this.value_
-      },
-      set(value) {
-        alert(value)
-      }
-    },
     value: {
       get() {
         return this.value_
@@ -32,6 +24,12 @@ export default {
         this.value_ = value
         this.refresh()
       }
+    },
+    hidden() {
+      if (typeof this.data.hidden !== 'undefined' && this.data.hidden) {
+        return true
+      }
+      return false
     }
   },
   mounted() {

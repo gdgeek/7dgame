@@ -1,35 +1,7 @@
 <template>
   <div v-if="env.canDocument()">
-    <el-tabs v-if="env.mrpp()" type="border-card" lazy>
-      <el-tab-pane label="首页">
-        <document :post-id="999" :category="true" />
-      </el-tab-pane>
-      <el-tab-pane label="新闻">
-        <document-list :category-id="74" />
-      </el-tab-pane>
-      <el-tab-pane label="相关下载">
-        <document-list :category-id="77" />
-      </el-tab-pane>
-      <el-tab-pane label="案例教程">
-        <document-list :category-id="79" />
-      </el-tab-pane>
-    </el-tabs>
-
-    <el-tabs v-if="env.mrcn()" type="border-card" lazy>
-      <el-tab-pane label="首页">
-        <document :post-id="999" :category="true" />
-      </el-tab-pane>
-      <el-tab-pane label="新闻">
-        <document-list :category-id="74" />
-      </el-tab-pane>
-      <el-tab-pane label="相关下载">
-        <document-list :category-id="84" />
-      </el-tab-pane>
-      <el-tab-pane label="案例教程">
-        <document-list :category-id="79" />
-      </el-tab-pane>
-    </el-tabs>
-
+    <book v-if="env.mrpp()" :items="mrpp" />
+    <book v-if="env.mrcn()" :items="mrcn" />
     <el-tabs v-if="env.local()" type="border-card" lazy>
       <el-tab-pane :label="information.data.title">
         <local-page />
@@ -38,10 +10,10 @@
   </div>
 </template>
 <script>
-import url from 'url'
 import { mapState } from 'vuex'
 import environment from '@/environment.js'
 import Document from '@/components/Document.vue'
+import Book from '@/components/Book.vue'
 import DocumentList from '@/components/Home/DocumentList.vue'
 import LocalPage from '@/components/Home/LocalPage.vue'
 export default {
@@ -49,7 +21,24 @@ export default {
   components: {
     Document,
     DocumentList,
-    LocalPage
+    LocalPage,
+    Book
+  },
+  data() {
+    return {
+      mrpp: [
+        { label: '首页', type: 'document', id: 999 },
+        { label: '新闻', type: 'category', id: 74 },
+        { label: '相关下载', type: 'category', id: 77 },
+        { label: '案例教程', type: 'category', id: 79 }
+      ],
+      mrcn: [
+        { label: '首页', type: 'document', id: 999 },
+        { label: '新闻', type: 'category', id: 74 },
+        { label: '相关下载', type: 'category', id: 84 },
+        { label: '案例教程', type: 'category', id: 79 }
+      ]
+    }
   },
   computed: {
     env() {

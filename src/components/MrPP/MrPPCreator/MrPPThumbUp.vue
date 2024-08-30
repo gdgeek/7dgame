@@ -1,11 +1,8 @@
 <template>
   <div>
     <!-- <div>{{ userData.id }}</div> -->
-    <el-row
-      class="mrpp-header"
-      :gutter="10"
-    >
-      <el-col :span="11" style="padding-left:44px">
+    <el-row class="mrpp-header" :gutter="10">
+      <el-col :span="11" style="padding-left: 44px">
         <div class="grid-content"><b>标题</b></div>
       </el-col>
       <el-col :span="6" align="center">
@@ -16,14 +13,14 @@
       </el-col>
     </el-row>
 
-    <section v-if="items == '' ">
-      <br>
+    <section v-if="items == ''">
+      <br />
       <el-skeleton :rows="10" animated />
     </section>
     <section v-else>
       <div v-for="item in items" :key="item.id">
         <el-row class="mrpp-row" :gutter="10">
-          <el-col :span="10" style="padding-left:20px">
+          <el-col :span="10" style="padding-left: 20px">
             <div>
               <div class="grid-content">
                 <el-popover
@@ -34,7 +31,13 @@
                   trigger="hover"
                   :content="html(item.body)"
                 >
-                  <el-link slot="reference" :underline="false" type="primary" style="display:inline;color:#2190ac;line-height:24px" @click="gotoPost(item)">
+                  <el-link
+                    slot="reference"
+                    :underline="false"
+                    type="primary"
+                    style="display: inline; color: #2190ac; line-height: 24px"
+                    @click="gotoPost(item)"
+                  >
                     {{ item.title }}
                   </el-link>
                 </el-popover>
@@ -50,9 +53,7 @@
           </el-col>
 
           <el-col :span="1" align="center">
-            <span style="color:#fff">
-              .&nbsp;
-            </span>
+            <span style="color: #fff">.&nbsp;</span>
           </el-col>
           <el-col :span="6" align="center">
             <div class="grid-content">{{ item.author.nickname }}</div>
@@ -60,16 +61,14 @@
           <el-col :span="7" align="center">
             <div class="grid-content">{{ item.updated_at }}</div>
           </el-col>
-
         </el-row>
       </div>
     </section>
-    <br>
+    <br />
   </div>
 </template>
 
 <script>
-
 import { AbilityWorks } from '@/ability/ability'
 import { getMessagesWithLiker } from '@/api/v1/like'
 
@@ -86,7 +85,6 @@ export default {
   data() {
     return {
       items: null
-
     }
   },
   computed: {
@@ -105,7 +103,7 @@ export default {
         // console.log(response.data, '111')
         self.items = response.data
       })
-      .catch(function(error) {
+      .catch(function (error) {
         console.error(error)
       })
   },
@@ -142,7 +140,7 @@ export default {
     },
     gotoPost(item) {
       const self = this
-      self.$router.push({ path: '/community/post', query: { id: item.id }})
+      self.$router.push({ path: '/community/post', query: { id: item.id } })
     },
     filterHtml(html) {
       return html.replace(/<[^>]*>/g, '')
@@ -150,7 +148,7 @@ export default {
     html(body) {
       return this.cutString(this.filterHtml(body), 100)
     },
-    remove: function(item) {
+    remove: function (item) {
       const self = this
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',
@@ -168,7 +166,7 @@ export default {
           })
         })
     },
-    deleted: function(id) {
+    deleted: function (id) {
       deleteMessage(id)
         .then(response => {
           this.$message({
@@ -176,25 +174,24 @@ export default {
             message: '删除成功!'
           })
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error)
         })
         .finally(() => {})
     }
-
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.tagawesome{
+.tagawesome {
   cursor: pointer;
 }
 .el-row {
   margin-bottom: 0px;
 }
-.el-link:hover{
-  color: #4db8db!important;
+.el-link:hover {
+  color: #4db8db !important;
   /* opacity: 0.9; */
 }
 .mrpp-header {
@@ -204,7 +201,7 @@ export default {
   border-style: solid;
   border-width: 1px;
   border-color: lightgrey;
-  background-color:gainsboro;
+  background-color: gainsboro;
 }
 .mrpp-row {
   border-radius: 0px;

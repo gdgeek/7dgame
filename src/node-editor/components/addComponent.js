@@ -3,7 +3,9 @@ import { NumControl } from '../controls/numControl.js'
 import { NumSocket } from '../sockets/sockets'
 
 export class AddComponent extends Rete.Component {
-  constructor() { super('Add') }
+  constructor() {
+    super('Add')
+  }
 
   builder(node) {
     var inp1 = new Rete.Input('num', 'Number', NumSocket)
@@ -21,12 +23,14 @@ export class AddComponent extends Rete.Component {
   }
 
   worker(node, inputs, outputs) {
-  //  alert(4)
     var n1 = inputs['num'].length ? inputs['num'][0] : node.data.num1
     var n2 = inputs['num2'].length ? inputs['num2'][0] : node.data.num2
     var sum = n1 + n2
 
-    this.editor.nodes.find(n => n.id === node.id).controls.get('preview').setValue(sum)
+    this.editor.nodes
+      .find(n => n.id === node.id)
+      .controls.get('preview')
+      .setValue(sum)
     outputs['res'] = sum
   }
 }

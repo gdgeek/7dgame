@@ -9,13 +9,20 @@ export function postMessage(data) {
 
 export function getMessage(id) {
   return request({
-    url: 'v1/messages/' + id + '?expand=messageTags,replies,author,like,likesCount',
+    url:
+      'v1/messages/' +
+      id +
+      '?expand=messageTags,replies,author,like,likesCount',
     method: 'get'
   })
 }
 
-export function getMessages(sort = '-created_at', search = null, page = 0, tag = NaN) {
-  // alert(sort)
+export function getMessages(
+  sort = '-created_at',
+  search = null,
+  page = 0,
+  tag = NaN
+) {
   let url = 'v1/messages?expand=author,messageTags&sort=' + sort
   if (!isNaN(tag)) {
     url += '&tag=' + tag

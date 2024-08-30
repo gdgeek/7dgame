@@ -7,6 +7,8 @@
       <el-col :sm="16">
         <el-card v-if="verse" class="box-card">
           <div slot="header">
+            <i class="el-icon-edit" v-if="saveable"></i>
+            <i class="el-icon-view" v-else></i>
             <b id="title">【宇宙】名称：</b>
             <span>{{ verse.name }}</span>
           </div>
@@ -34,8 +36,14 @@
             size="mini"
             @click="comeIn()"
           >
-            <font-awesome-icon icon="edit" />
-            &nbsp;编辑【宇宙】
+            <div v-if="saveable">
+              <font-awesome-icon icon="edit" />
+              &nbsp;编辑【宇宙】
+            </div>
+            <div v-else>
+              <font-awesome-icon icon="eye" />
+              &nbsp;查看【宇宙】
+            </div>
           </el-button>
           <br />
         </el-card>
@@ -90,7 +98,7 @@
             &nbsp;关闭【宇宙】
           </el-button>
         </el-card>
-        <share v-if="canShare" :verseId="verse.id" />
+        <share v-if="saveable" :verse="verse" />
 
         <br />
       </el-col>
@@ -126,14 +134,12 @@ export default {
     ...mapState({
       tagsMap: state => state.tags.tagsMap
     }),
-    canShare() {
-      const self = this
-
-      if (self.verse === null) {
+    saveable() {
+      if (this.verse === null) {
         return false
       }
 
-      return self.$can('update', new AbilityWorks(self.verse.author_id))
+      return this.$can('update', new AbilityWorks(this.verse.author_id))
     },
     id() {
       return parseInt(this.$route.query.id)
@@ -185,7 +191,7 @@ export default {
 
         {
           path: '/meta-verse',
-          meta: { title: '元&宇宙' }
+          meta: { title: '宇宙' }
         },
         {
           path: '.',
@@ -201,13 +207,16 @@ export default {
     }),
     async refresh() {
       const self = this
-      const res = await getVerse(self.id, 'image,verseOpen,author, message')
+      const res = await getVerse(
+        self.id,
+        'image,verseOpen,verseShare,author, message'
+      )
       this.verse = res.data
       if (this.message !== null) {
         this.briefing = this.message
       } else {
         this.briefing = {
-          title: '【元&宇宙】名称：' + this.verse.name,
+          title: '【宇宙】名称：' + this.verse.name,
           body: this.info.description
         }
       }
@@ -260,7 +269,7 @@ export default {
     },
     comeIn() {
       const self = this
-      self.$router.push({ path: '/verse/rete-verse', query: { id: self.id } })
+      self.$router.push({ path: '/verse/scene', query: { id: self.id } })
     }
   }
 }

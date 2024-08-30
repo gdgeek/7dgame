@@ -62,6 +62,8 @@ export default {
     getAblity(roles) {
       if (roles.includes('root')) {
         return '根用户'
+      } else if (roles.includes('admin')) {
+        return '超级管理员'
       } else if (roles.includes('manager')) {
         return '管理员'
       } else if (roles.includes('user')) {

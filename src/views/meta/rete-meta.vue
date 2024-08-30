@@ -3,39 +3,27 @@
     <resource-dialog
       @selected="selectResources"
       @cancel="openResources()"
-      @getDatas="resources"
       ref="dialog"
-      :message="resourceMessage"
     />
     <el-container>
       <el-main>
         <el-card v-loading="loading" class="box-card">
           <div v-if="meta !== null" slot="header" class="clearfix">
-            <router-link :to="'/verse/rete-verse?id=' + meta.verse.id">
-              <el-link :underline="false">
-                【宇宙】{{ meta.verse.name }}
-              </el-link>
-            </router-link>
+           
             / 【元】{{ title }}
             <el-button-group style="float: right">
-              <el-button type="primary" size="mini" @click="arrange()">
-                <font-awesome-icon icon="project-diagram" />
-                整理
-              </el-button>
-              <!--
-              <el-button type="primary" size="mini" @click="editor()">
-                <font-awesome-icon icon="edit" />
-                编辑器（测试）
-              </el-button>
-              -->
               <el-button
-                v-if="canSave"
+                v-if="saveable"
                 type="primary"
                 size="mini"
                 @click="save()"
               >
                 <font-awesome-icon icon="save" />
                 保存
+              </el-button>
+              <el-button v-else type="primary" size="mini" @click="arrange()">
+                <font-awesome-icon icon="project-diagram" />
+                整理
               </el-button>
             </el-button-group>
           </div>
@@ -50,9 +38,9 @@
 <script>
 import editor from '@/node-editor/meta'
 import { getMeta, putMeta } from '@/api/v1/meta'
-import { getResources } from '@/api/resources'
-import ResourceDialog from '@/components/MrPP/MrPPResourceDialog.vue'
-import { AbilityWorks, AbilityShare } from '@/ability/ability'
+
+import ResourceDialog from '@/components/MrPP/ResourceDialog.vue'
+import { AbilityEditable } from '@/ability/ability'
 
 import { mapMutations } from 'vuex'
 export default {
@@ -62,8 +50,7 @@ export default {
   data() {
     return {
       resource: {
-        callback: null,
-        type: null
+        callback: null
       },
       loading: false,
       id: parseInt(this.$route.query.id),
@@ -72,32 +59,15 @@ export default {
     }
   },
   computed: {
-    resourceMessage() {
-      switch (this.resource.type) {
-        case 'video':
-          return '选择相应视频'
-        case 'audio':
-          return '选择相应音频'
-        case 'polygen':
-          return '选择相应模型'
-        case 'picture':
-          return '选择相应图片'
-      }
-      return '选择相应资源'
-    },
     title() {
       return this.$route.query.title
     },
-    canSave() {
-      const self = this
-
-      if (self.meta === null) {
+    saveable() {
+      if (this.meta === null) {
         return false
       }
-      return (
-        self.$can('update', new AbilityWorks(self.meta.author_id)) ||
-        self.$can('share', new AbilityShare(self.meta.share))
-      )
+
+      return this.$can('editable', new AbilityEditable(this.meta.editable))
     }
   },
 
@@ -110,7 +80,6 @@ export default {
     this.meta = response.data
 
     this.breadcrumb(this.meta)
-    //alert(JSON.stringify(this.meta))
     if (this.meta.data !== null) {
       await editor.setup(JSON.parse(this.meta.data))
     } else {
@@ -121,7 +90,7 @@ export default {
       await this.save()
     }
     this.loading = false
-    if (!this.canSave) {
+    if (!this.saveable) {
       editor.ban()
     }
   },
@@ -135,7 +104,7 @@ export default {
     })
   },
   beforeDestroy() {
-    if (this.canSave) {
+    if (this.saveable) {
       this.save()
     }
   },
@@ -151,7 +120,7 @@ export default {
             },
             {
               path: '/meta-verse/index',
-              meta: { title: '元&宇宙' }
+              meta: { title: '宇宙' }
             }
           ]
         })
@@ -161,34 +130,19 @@ export default {
             {
               path: '/',
               meta: { title: '元宇宙实景编程平台' }
-            },
-            {
-              path: '/meta-verse/index',
-              meta: { title: '元&宇宙' }
-            },
-            {
-              path: '/verse/view?id=' + this.meta.verse.id,
-              meta: { title: '【宇宙】' }
-            },
-            {
-              path: '/verse/rete-verse?id=' + this.meta.verse.id,
-              meta: { title: '宇宙编辑' }
-            },
-            {
-              path: '.',
-              meta: { title: '元编辑' }
             }
           ]
         })
       }
     },
-    openResources({ callback, type } = { callback: null, type: null }) {
-      if (this.canSave) {
+    openResources(
+      { value, callback, type } = { value: null, callback: null, type: null }
+    ) {
+      if (this.saveable) {
         this.resource.callback = callback
-        this.resource.type = type
 
         if (callback !== null) {
-          this.$refs.dialog.open()
+          this.$refs.dialog.open(value, this.id, type)
         }
       }
     },
@@ -198,24 +152,17 @@ export default {
       }
     },
 
-    resources(data, callback) {
-      getResources(
-        this.resource.type,
-        data.sorted,
-        data.searched,
-        data.current
-      ).then(response => callback(response))
-    },
     async save() {
-      if (this.canSave) {
+      if (this.saveable) {
         const data = await editor.save()
         await putMeta(this.id, {
           data
         })
+        editor.arrange()
       }
     },
     async arrange() {
-      await editor.arrange()
+      editor.arrange()
     }
   }
 }

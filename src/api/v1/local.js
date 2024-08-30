@@ -1,4 +1,6 @@
 import request from '@/utils/request'
+var qs = require('querystringify')
+var path = require('path')
 
 export function information() {
   return request({
@@ -14,9 +16,9 @@ export function ready() {
   })
 }
 
-export function signup(data) {
+export function init(data) {
   return request({
-    url: 'v1/locals/signup',
+    url: 'v1/locals/init',
     method: 'post',
     data
   })

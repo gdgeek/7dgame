@@ -1,18 +1,25 @@
 import request from '@/utils/request'
 import { v4 as uuidv4 } from 'uuid'
+import { convertToHttps } from '@/assets/js/helper'
 var qs = require('querystringify')
 var path = require('path')
 function postResources(data) {
   data.uuid = uuidv4()
-  console.error(data)
+
+  const url = path.join('resources')
   return request({
-    url: '/resources',
+    url,
     method: 'post',
     data
   })
 }
 export function postPolygen(data) {
   data.type = 'polygen'
+  return postResources(data)
+}
+
+export function postVoxel(data) {
+  data.type = 'voxel'
   return postResources(data)
 }
 
@@ -32,12 +39,16 @@ export function postAudio(data) {
 }
 
 function deleteResources(id) {
+  const url = path.join('resources', id.toString())
   return request({
-    url: '/resources/' + id,
+    url,
     method: 'delete'
   })
 }
 export function deletePolygen(id) {
+  return deleteResources(id)
+}
+export function deleteVoxel(id) {
   return deleteResources(id)
 }
 
@@ -52,8 +63,9 @@ export function deleteAudio(id) {
 }
 
 function putResources(id, resource) {
+  const url = path.join('resources', id.toString())
   return request({
-    url: '/resources/' + id,
+    url,
     method: 'put',
     data: resource
   })
@@ -61,6 +73,10 @@ function putResources(id, resource) {
 
 export function putPolygen(id, polygen) {
   return putResources(id, polygen)
+}
+
+export function putVoxel(id, voxel) {
+  return putResources(id, voxel)
 }
 export function putPicture(id, picture) {
   return putResources(id, picture)
@@ -91,8 +107,9 @@ export function getResources(
     query['page'] = page
   }
 
+  const url = path.join('resources' + qs.stringify(query, true))
   return request({
-    url: path.join('resources' + qs.stringify(query, true)),
+    url,
     method: 'get'
   })
 }
@@ -103,9 +120,13 @@ export function getResourceList() {
     method: 'get'
   })
 }*/
-export function postPolygens(sort = '-created_at', search = '', page = 0) {
+export function getPolygens(sort = '-created_at', search = '', page = 0) {
   return getResources('polygen', sort, search, page)
 }
+export function getVoxels(sort = '-created_at', search = '', page = 0) {
+  return getResources('voxel', sort, search, page)
+}
+
 export function getPictures(sort = '-created_at', search = '', page = 0) {
   return getResources('picture', sort, search, page)
 }
@@ -125,15 +146,73 @@ export function getResource(type, id, expand = 'image,author') {
     method: 'get'
   })
 }
-export function getPolygen(id, expand = 'image,file,author') {
-  return getResource('polygen', id, expand)
+export async function getPolygen(id, expand = 'image,file,author') {
+  return new Promise((resolve, reject) => {
+    getResource('polygen', id, expand)
+      .then(response => {
+        if (response.data.file && response.data.file.url) {
+          response.data.file.url = convertToHttps(response.data.file.url)
+        }
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
 }
-export function getPicture(id, expand = 'image,file,author') {
-  return getResource('picture', id, expand)
+export async function getVoxel(id, expand = 'image,file,author') {
+  return new Promise((resolve, reject) => {
+    getResource('voxel', id, expand)
+      .then(response => {
+        if (response.data.file && response.data.file.url) {
+          response.data.file.url = convertToHttps(response.data.file.url)
+        }
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
+}
+export async function getPicture(id, expand = 'image,file,author') {
+  return new Promise((resolve, reject) => {
+    getResource('picture', id, expand)
+      .then(response => {
+        if (response.data.file && response.data.file.url) {
+          response.data.file.url = convertToHttps(response.data.file.url)
+        }
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
 }
 export function getVideo(id, expand = 'image,file,author') {
-  return getResource('video', id, expand)
+  return new Promise((resolve, reject) => {
+    getResource('video', id, expand)
+      .then(response => {
+        if (response.data.file && response.data.file.url) {
+          response.data.file.url = convertToHttps(response.data.file.url)
+        }
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
 }
 export function getAudio(id, expand = 'image,file,author') {
-  return getResource('audio', id, expand)
+  return new Promise((resolve, reject) => {
+    getResource('audio', id, expand)
+      .then(response => {
+        if (response.data.file && response.data.file.url) {
+          response.data.file.url = convertToHttps(response.data.file.url)
+        }
+        resolve(response)
+      })
+      .catch(error => {
+        reject(error)
+      })
+  })
 }

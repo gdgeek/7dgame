@@ -1,24 +1,18 @@
 <template>
   <div>
-    <resource-dialog
+    <knight-data-dialog ref="knightData" @submit="knightDataSubmit" />
+    <knight-setup-dialog
       @selected="knightSelect"
-      @cancel="openKnight(null)"
-      @getDatas="getKnights"
-      message="选择相应骑士"
-      ref="knightDialog"
+      @cancel="clearKnight()"
+      ref="knightSetup"
     />
-    <resource-dialog
+    <space-dialog
       @selected="spaceSelect"
-      @cancel="openSpace(null)"
-      @getDatas="getSpaces"
-      message="选择相应空间"
+      @cancel="clearSpace()"
       ref="spaceDialog"
     />
-    <event-dialog
-      :target="event.target"
-      @postEvent="postEvent"
-      ref="dialog"
-    ></event-dialog>
+   
+    
     <el-container>
       <el-main>
         <el-card v-loading="loading" class="box-card">
@@ -26,12 +20,8 @@
             【宇宙】{{ verse.name }}
 
             <el-button-group style="float: right">
-              <el-button type="primary" size="mini" @click="arrange()">
-                <font-awesome-icon icon="project-diagram" />
-                整理
-              </el-button>
               <el-button
-                v-if="canSave"
+                v-if="saveable"
                 type="primary"
                 size="mini"
                 @click="save()"
@@ -39,9 +29,13 @@
                 <font-awesome-icon icon="save" />
                 保存
               </el-button>
+              <el-button v-else type="primary" size="mini" @click="arrange()">
+                <font-awesome-icon icon="project-diagram" />
+                整理
+              </el-button>
             </el-button-group>
           </div>
-          <div v-show="visible" class="rete" ref="rete" />
+          <div class="rete" ref="rete" />
         </el-card>
       </el-main>
     </el-container>
@@ -51,68 +45,78 @@
 <script>
 import editor from '@/node-editor/verse'
 import { putVerse } from '@/api/v1/verse'
-import {
-  getMetaEventByMetaId,
-  putMetaEvent,
-  postMetaEvent
-} from '@/api/v1/meta-event'
+
 import { mapMutations } from 'vuex'
 import { getVerse } from '@/api/v1/verse'
-import { getKnights } from '@/api/v1/knight'
-import { getSpaces } from '@/api/v1/space'
-import ResourceDialog from '@/components/MrPP/MrPPResourceDialog.vue'
-import { AbilityWorks, AbilityShare } from '@/ability/ability'
-import {
-  getVerseEventByVerseId,
-  putVerseEvent,
-  postVerseEvent
-} from '@/api/v1/verse-event'
-import EventDialog from '@/components/Rete/EventDialog.vue'
+var randomWords = require('random-words')
+import { v4 as uuidv4 } from 'uuid'
+import SpaceDialog from '@/components/MrPP/SpaceDialog.vue'
+import KnightDataDialog from '@/components/MrPP/KnightDataDialog.vue'
+import KnightSetupDialog from '@/components/MrPP/KnightSetupDialog.vue'
 
+import { AbilityEditable } from '@/ability/ability'
+
+async function sleep(time) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(null)
+    }, time)
+  })
+}
 export default {
   components: {
-    EventDialog,
-    ResourceDialog
+    KnightSetupDialog,
+    SpaceDialog,
+    KnightDataDialog
   },
 
   data() {
     return {
+      banKnight: [],
       loading: false,
       knight: { callback: null },
       space: { callback: null },
       id: parseInt(this.$route.query.id),
       verse: null,
-      visible: true,
-      event: {
-        target: null,
-        map: new Map()
-      }
     }
   },
 
   async mounted() {
     editor.initVerse({
       container: this.$refs.rete,
-      verseId: this.id,
+      verse_id: this.id,
       root: this
     })
-    const response = await getVerse(this.id)
+
+    const response = await getVerse(this.id, 'metaKnights,share')
 
     this.verse = response.data
-
-    let data = null
-
-    if (this.verse.data !== null) {
-      data = JSON.parse(this.verse.data)
-      await editor.setup(data)
-      await this.setSlots(data)
-    } else {
-      data = editor.create({
-        name: this.verse.name,
-        id: this.verse.id
+    if (this.verse.data == null) {
+      this.verse.data = JSON.stringify({
+        type: 'Verse',
+        parameters: {
+          uuid: uuidv4(),
+          space: {
+            id: -1,
+            occlusion: false
+          }
+        },
+        children: {
+          metas: []
+        }
       })
     }
-    if (!this.canSave) {
+
+    const data = JSON.parse(this.verse.data)
+   
+    if (!data.children.modules) {
+      data.children.modules = []
+    }
+    //初始化数据
+    await editor.setup(data)
+    await this.arrange()
+
+    if (!this.saveable) {
       editor.ban()
     }
   },
@@ -126,7 +130,7 @@ export default {
         },
         {
           path: '/meta-verse/index',
-          meta: { title: '元&宇宙' }
+          meta: { title: '宇宙' }
         },
         {
           path: '/verse/view?id=' + this.id,
@@ -145,28 +149,33 @@ export default {
     })
   },
   computed: {
-    canSave() {
+    saveable() {
       if (this.verse === null) {
         return false
       }
-      return (
-        this.$can('update', new AbilityWorks(this.verse.author_id)) ||
-        this.$can('share', new AbilityShare(this.verse.share))
-      )
+      return this.$can('editable', new AbilityEditable(this.verse.editable))
     }
   },
   methods: {
     ...mapMutations('breadcrumb', ['setBreadcrumbs']),
-    getSpaces(data, callback) {
-      getSpaces(data.sorted, data.searched, data.current).then(response =>
-        callback(response)
-      )
+    knightDataSubmit(data) {
+      console.error(data)
     },
-    openSpace(callback) {
-      if (this.canSave) {
+    metaForm(params) {
+    
+      this.$refs.knightData.open(params)
+    },
+    createMetaKnight() {
+      this.$refs.knightSetup.open()
+    },
+    clearSpace() {
+      this.space.callback = null
+    },
+    openSpace({ value, callback }) {
+      if (this.saveable) {
         this.space.callback = callback
         if (this.space.callback) {
-          this.$refs.spaceDialog.open()
+          this.$refs.spaceDialog.open(value, this.id)
         }
       }
     },
@@ -175,164 +184,73 @@ export default {
         this.space.callback(data)
       }
     },
+    setupKnight(data) {
+      if (this.saveable) {
+        this.$refs.knightSetup.open(data)
+      }
+    },
 
-    getKnights(data, callback) {
-      getKnights(data.sorted, data.searched, data.current).then(response => {
-        callback(response)
+   
+    clearKnight() {
+      this.knight.callback = null
+    },
+    async knightSelect({ data,setup }) {
+   
+       await editor.addModule({
+        meta_id : data.id,
+        data : JSON.stringify(setup)
       })
-    },
-    openKnight(callback) {
-      if (this.canSave) {
-        this.knight.callback = callback
-        if (this.knight.callback) {
-          this.$refs.knightDialog.open()
-        }
-      }
-    },
-    knightSelect(data) {
-      if (this.knight.callback !== null) {
-        this.knight.callback(data)
-      }
     },
     _setVerseName(name) {
       this.verse.name = name
     },
-
-    async _doEvent(id) {
-      if (this.canSave) {
-        if (this.event.map.has(id)) {
-          this.event.target = this.event.map.get(id)
-        } else {
-          this.event.target = await this.getMetaEvent(id)
-          this.event.map.set(id, this.event.target)
+    _addMeta(meta) {
+      this.verse.metas.push(meta)
+    },
+    _deleteMeta(meta_id) {
+      const index = this.verse.metas.findIndex(item => {
+        if (item.id === meta_id) {
+          return true
         }
-        this.$refs.dialog.open()
+        return false
+      })
+      if (index !== -1) {
+        this.verse.metas.splice(index, 1)
       }
     },
-
-    ///////////event
-    async getVerseEvent(id) {
-      try {
-        const response = await getVerseEventByVerseId(id)
-        if (response.data.length !== 0) {
-          return response.data[0]
-        } else {
-          if (this.canSave) {
-            const post = await postVerseEvent({
-              verse_id: id,
-              data: JSON.stringify({})
-            })
-            return post.data
-          }
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    },
-    async getMetaEvent(meta_id) {
-      try {
-        const response = await getMetaEventByMetaId(meta_id)
-
-        if (response.data.length !== 0) {
-          return response.data[0]
-        } else {
-          if (this.canSave) {
-            const post = await postMetaEvent({
-              meta_id,
-              data: JSON.stringify({ input: [], output: [] })
-            })
-            return post.data
-          }
-        }
-      } catch (e) {
-        console.error(e)
-      }
-    },
-    async postEvent({ input, output }) {
-      if (this.canSave && this.event.target) {
-        const response = await putMetaEvent(this.event.target.id, {
-          data: JSON.stringify({ input, output })
-        })
-        const data = response.data
-        if (this.event.map.has(data.meta_id)) {
-          const item = this.event.map.get(data.meta_id)
-          editor.loadEvent(data.meta_id, JSON.parse(item.data), {
-            input,
-            output
-          })
-          this.event.map.set(data.meta_id, data)
-        }
-      }
-      this.$refs.dialog.close()
-    },
+   
 
     async save() {
+     
       const self = this
       const verse_id = this.id
-      return new Promise(async function (resolve, reject) {
-        if (self.canSave) {
-          const list = await editor.saveEvent()
 
-          const linked = await self.getVerseEvent(verse_id)
-          await putVerseEvent(linked.id, { data: JSON.stringify(list) })
-          await editor.removeLinked()
-          const data = await editor.save()
-          await putVerse(verse_id, {
-            data
-          })
-          await self.addLinked()
-        }
-        resolve()
-      })
+      if (self.saveable) {
+      
+        const data = await editor.save()
+      
+        await putVerse(verse_id, {
+          data
+        })
+
+        this.$message({
+          message: '保存成功',
+          type: 'success'
+        })
+        await this.arrange()
+      }
     },
-    async create(data) {
-      return await editor.create(data)
-    },
+
     async arrange() {
-      await editor.removeLinked()
-      editor.arrange()
-      await this.addLinked()
-    },
-    async setup(json) {
-      const data = JSON.parse(json)
-      await editor.setup(data)
-      this.checkMetas(data)
-      this.setSlots(data)
-      return data
-    },
-    async addLinked() {
-      const linked = await this.getVerseEvent(this.id)
-      if (linked && linked.data) {
-        const parse = JSON.parse(linked.data)
-        if (parse instanceof Array) {
-          parse.forEach(async item => {
-            await editor.addLinked(item)
-          })
-        }
-      }
-    },
-    async setSlots(data) {
-      for (let i = 0; i < data.children.metas.length; ++i) {
-        const item = data.children.metas[i]
-        if (item.type.toLowerCase() == 'meta') {
-          const event = await this.getMetaEvent(item.parameters.id)
-          if (event) {
-            this.event.map.set(item.parameters.id, event)
-
-            await editor.addEvent(item.parameters.uuid, event)
-
-            this.$nextTick(function () {
-              editor.arrange()
-            })
-          }
-        }
-      }
-      await this.addLinked()
+      await editor.arrange()
+      await sleep(300)
+  
+      await editor.arrange()
     }
   },
 
   beforeDestroy() {
-    if (this.canSave) {
+    if (this.saveable) {
       this.save()
     }
   }

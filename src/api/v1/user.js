@@ -21,6 +21,15 @@ export function getUserCreation() {
     method: 'get'
   })
 }
+
+export function getTest() {
+  const url = path.join('v1', 'uploads', 'file')
+
+  return request({
+    url,
+    method: 'post'
+  })
+}
 export function getUserData(token) {
   return request({
     url: 'v1/users/get-data',

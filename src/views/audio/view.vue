@@ -74,7 +74,8 @@
 </template>
 <script>
 import { getAudio, putAudio, deleteAudio } from '@/api/resources'
-import { postFile } from '@/api/files'
+
+import { postFile } from '@/api/v1/files'
 // import { printVector2 } from '@/assets/js/helper'
 import { mapState } from 'vuex'
 
@@ -162,7 +163,7 @@ export default {
       this.isPlay = false
       console.log('结束播放', this.isPlay)
     },
-    save(md5, extension, info, file, handler) {
+    async save(md5, extension, info, file, handler) {
       const self = this
       const data = {
         md5,
@@ -170,22 +171,18 @@ export default {
         filename: file.name,
         url: self.store.fileUrl(md5, extension, handler, 'screenshot/audio')
       }
-      postFile(data)
-        .then(response => {
-          const audio = { image_id: response.data.id, info }
-          putAudio(self.data.id, audio)
-            .then(response => {
-              self.data.image_id = response.data.image_id
-              self.data.info = response.data.info
-              self.expire = false
-            })
-            .catch(err => {
-              console.log(err)
-            })
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      try {
+        const response1 = await postFile(data)
+
+        const audio = { image_id: response1.data.id, info }
+        const response2 = await putAudio(self.data.id, audio)
+
+        self.data.image_id = response2.data.image_id
+        self.data.info = response2.data.info
+        self.expire = false
+      } catch (e) {
+        console.error(e)
+      }
     },
     dealWith: function () {
       const self = this
@@ -226,17 +223,15 @@ export default {
         blob.extension = '.jpg'
         const file = blob
         const md5 = await store.fileMD5(file)
-        const handler = await store.storeHandler()
-        const ret = await store.fileHas(
+        const handler = await store.publicHandler()
+        const has = await store.fileHas(
           md5,
           file.extension,
           handler,
           'screenshot/audio'
         )
-        if (ret !== null) {
-          self.save(ret.md5, ret.extension, info, file, handler)
-        } else {
-          const r = await store.fileUpload(
+        if (!has) {
+          await store.fileUpload(
             md5,
             file.extension,
             file,
@@ -244,27 +239,10 @@ export default {
             handler,
             'screenshot/audio'
           )
-          self.save(md5, file.extension, info, file, handler)
         }
+        await self.save(md5, file.extension, info, file, handler)
       }
     },
-    // init: function () {
-    //   const audio = document.getElementById('audio')
-    //   const source = document.getElementById('src')
-
-    //   // 获取新的音频
-    //   const new_audio = document.getElementById('new_audio')
-    //   new_audio.src = source.src + '?t=' + new Date()
-    //   new_audio.crossOrigin = 'anonymous'
-    //   new_audio.currentTime = 0.000001
-    //   audio.addEventListener(
-    //     'timeupdate',
-    //     function () {
-    //       new_audio.currentTime = audio.currentTime
-    //     },
-    //     false
-    //   )
-    // },
 
     deleteWindow: function () {
       const self = this
@@ -288,18 +266,16 @@ export default {
           })
         })
     },
-    delete: function (id) {
+    delete: async function (id) {
       const self = this
       console.log(self.api + '/resources/' + id + '?type=audio')
-
-      deleteAudio(id)
-        .then(response => {
-          self.$router.push({ path: '/audio/index' })
-        })
-        .catch(function (error) {
-          console.log(error)
-          self.failed(JSON.parse(error.message))
-        })
+      try {
+        await deleteAudio(id)
+        this.$router.push({ path: '/audio/index' })
+      } catch (err) {
+        console.error(err)
+        this.failed(JSON.parse(err.message))
+      }
     },
     namedWindow: function () {
       const self = this
@@ -323,17 +299,15 @@ export default {
           })
         })
     },
-    named: function (id, name) {
-      const self = this
+    named: async function (id, name) {
       const audio = { name }
       console.log(audio)
-      putAudio(id, audio)
-        .then(response => {
-          self.data.name = response.data.name
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      try {
+        const response = await putAudio(id, audio)
+        this.data.name = response.data.name
+      } catch (err) {
+        console.error(err)
+      }
     }
   }
 }

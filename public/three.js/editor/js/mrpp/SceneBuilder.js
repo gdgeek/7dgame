@@ -1,40 +1,46 @@
 import * as THREE from 'three'
-
-import { AddObjectCommand } from '../commands/AddObjectCommand.js'
-import { GLTFLoader } from '../../../examples/jsm/loaders/GLTFLoader.js'
-import { DRACOLoader } from '../../../examples/jsm/loaders/DRACOLoader.js'
-
+/*
+import { MetaFactory } from './MetaFactory.js'
 class SceneBuilder {
 	constructor(editor) {
 		this.editor = editor
+		this.factory = new MetaFactory()
 	}
-	async loadPolygen(url) {
-		//	alert(url)
-		return new Promise((resolve, reject) => {
-			const loader = new GLTFLoader(THREE.DefaultLoadingManager)
-			const dracoLoader = new DRACOLoader()
-			dracoLoader.setDecoderPath('./draco/')
-			loader.setDRACOLoader(dracoLoader)
-			const self = this
 
-			loader.load(
-				// resource URL
-				url,
-				// called when the resource is loaded
-				function (gltf) {
-					resolve(gltf.scene)
-				},
-				// called while loading is progressing
-				function (xhr) {
-					//console.log((xhr.loaded / xhr.total) * 100 + '% loaded!')
-				},
-				// called when loading has errors
-				function (error) {
-					reject(error)
-					console.error('An error happened')
+	async readMeta(root, data, resources) {
+
+
+		if (data.children) {
+			for (let i = 0; i < data.children.entities.length; ++i) {
+				if (data.children.entities[i] != null) {
+					try {
+						const node = await this.factory.building(data.children.entities[i], resources)
+
+						if (node != null) {
+							this.lockNode(node)
+							root.add(node)
+							this.editor.signals.sceneGraphChanged.dispatch()
+						}
+					} catch (error) {
+
+						console.error(error)
+					}
 				}
-			)
-		})
+			}
+		}
+	}
+
+	setTransform(node, transform) {
+		const p = transform.position
+		const s = transform.scale
+		const r = transform.rotate
+		node.position.set(p.x, p.y, p.z)
+		node.scale.set(s.x, s.y, s.z)
+		node.rotation.set(
+			THREE.Math.degToRad(r.x),
+			THREE.Math.degToRad(r.y),
+			THREE.Math.degToRad(r.z)
+		)
 	}
 	getMatrix4(transform) {
 		const p = transform.position
@@ -54,106 +60,19 @@ class SceneBuilder {
 		return rotate
 	}
 
-	async getPolygen(data, resources) {
-		if (resources.has(data.parameters.polygen)) {
-			const resource = resources.get(data.parameters.polygen)
-			const node = await this.loadPolygen(resource.file.url)
-			node.name = data.parameters.name + '[polygen]'
-			node.uuid = resource.file.md5
-			return node
-		}
-		return null
-	}
-
-	async getPlane(url, width, height) {
-		const textureLoader = new THREE.TextureLoader()
-		return new Promise(resolve => {
-			textureLoader.load(url, texture => {
-				const geometry = new THREE.PlaneGeometry(width, height)
-				const material = new THREE.MeshBasicMaterial({
-					color: 0xffffff,
-					side: THREE.DoubleSide,
-					map: texture
-				})
-				const plane = new THREE.Mesh(geometry, material)
-				resolve(plane)
-			})
-		})
-	}
-	async getText(data, resources) {
-		const text = data.parameters.text
-
-		const geometry = new THREE.PlaneGeometry(
-			0.1 * text.length + 0.05,
-			0.1 + 0.05
-		)
-		const material = new THREE.MeshBasicMaterial({
-			color: 0x8888ff,
-			side: THREE.DoubleSide
-		})
-		const plane = new THREE.Mesh(geometry, material)
-
-		plane.name = data.parameters.name + '[text]'
-		return plane
-	}
-	async getVideo(data, resources) {
-		const self = this
-		const resource = resources.get(data.parameters.video)
-		const info = JSON.parse(resource.info)
-		const size = info.size
-		const width = data.parameters.width
-		const height = width * (size.y / size.x)
-		const plane = await self.getPlane(resource.image.url, width, height)
-
-		plane.name = data.parameters.name + '[video]'
-		return plane
-	}
 	lockNode(node) {
-		node.locked = true
-		node.children.forEach(item => {
-			this.lockNode(item)
-		})
+		this.factory.lockNode(node)
 	}
+
+
 	async addEntity(entity, resources) {
-		let node = editor.objectByUuid(entity.parameters.uuid)
 
-		if (typeof node === 'undefined') {
-			node = new THREE.Object3D()
-			node.name = entity.parameters.name
-			node.uuid = entity.parameters.uuid
-			node.applyMatrix4(this.getMatrix4(entity.parameters.transform))
-			const point = await this.building(entity, resources)
-			if (point !== null) {
-				node.add(point)
-			}
-		}
+		return await this.factory.building(entity, resources)
 
-		for (let i = 0; i < entity.children.entities.length; ++i) {
-			const child = await this.addEntity(entity.children.entities[i], resources)
-			node.add(child)
-		}
-		return node
-	}
-	async building(data, resources) {
-		let node = null
-		switch (data.type.toLowerCase()) {
-			case 'polygen':
-				node = await this.getPolygen(data, resources)
-				break
-			case 'video':
-				node = await this.getVideo(data, resources)
-				break
-			case 'text':
-				node = await this.getText(data, resources)
-				break
-		}
-		if (node !== null) {
-			this.lockNode(node)
-		}
-		return node
 	}
 
-	async loadRoom() {
+
+	async lights() {
 		const light = {
 			metadata: {
 				version: 4.5,
@@ -221,4 +140,6 @@ class SceneBuilder {
 	}
 }
 
+
 export { SceneBuilder }
+*/

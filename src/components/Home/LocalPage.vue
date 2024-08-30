@@ -20,7 +20,7 @@
 
 <script>
 import QrcodeVue from 'qrcode.vue'
-import environment from '@/environment.js'
+import env from '@/environment.js'
 import { mapState } from 'vuex'
 export default {
   name: 'LocalPage',
@@ -30,7 +30,7 @@ export default {
   data() {
     const qrcode = {
       veri: 'MrPP.com',
-      api: environment.api
+      api: env.api
     }
     return {
       value: JSON.stringify(qrcode),

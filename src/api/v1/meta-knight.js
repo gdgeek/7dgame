@@ -1,4 +1,6 @@
 import request from '@/utils/request'
+var qs = require('querystringify')
+var path = require('path')
 export function postMetaKnight(data) {
   return request({
     url: 'v1/meta-knights',
@@ -7,12 +9,17 @@ export function postMetaKnight(data) {
   })
 }
 
-export function getMetaKnight(id) {
+export function getMetaKnight(id, expand = '') {
   return request({
-    url: 'v1/meta-knights/' + id,
+    url: path.join(
+      'v1',
+      'meta-knights',
+      id.toString() + qs.stringify({ expand: expand }, true)
+    ),
     method: 'get'
   })
 }
+
 export function getMetaKnights(sort = '-created_at', search = '', page = 0) {
   let url = 'v1/meta-knights?sort=' + sort
 

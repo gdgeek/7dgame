@@ -12,12 +12,12 @@ var MetaRootType = {
     },
     {
       type: 'button',
-      label: '赛博',
+      label: '脚本',
       title: '逻辑编辑',
-      key: 'cyber',
+      key: 'script',
       callback: function (root) {
         root.$router.push({
-          path: '/meta/cyber',
+          path: '/meta/script',
           query: root.$route.query
         })
       },

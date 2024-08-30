@@ -28,7 +28,7 @@ var PolygenType = {
 
     {
       type: 'resource',
-      key: 'polygen',
+      key: 'resource',
       resource: 'polygen',
       title: '模型',
       readonly: false

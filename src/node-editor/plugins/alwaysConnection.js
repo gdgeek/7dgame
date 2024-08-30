@@ -5,9 +5,6 @@ function install(editor, options) {
   })
   let removeNode = -1
   editor.on('noderemove', async component => {
-    if (editor.silent) {
-      return true
-    }
     if (map.has(component.name)) {
       removeNode = component.id
       setTimeout(() => {
@@ -18,10 +15,7 @@ function install(editor, options) {
     return true
   })
 
-  editor.on('nodecreate', async component => {
-    if (editor.silent) {
-      return true
-    }
+  editor.on('nodecreated', component => {
     if (map.has(component.name)) {
       setTimeout(() => {
         const option = map.get(component.name)

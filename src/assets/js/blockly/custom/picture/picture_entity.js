@@ -21,7 +21,6 @@ const block = {
             const picture = resource.picture
             let opt = [['none', '']]
             picture.forEach(pic => {
-              // alert(poly.name)
               opt.push([pic.name, pic.uuid])
             })
             return opt
@@ -48,7 +47,7 @@ const block = {
     const lua = function (block) {
       var dropdown = block.getFieldValue('Picture')
 
-      return [Helper.handler(index, dropdown), Blockly.Lua.ORDER_NONE]
+      return [Helper.handler(dropdown), Blockly.Lua.ORDER_NONE]
     }
     return lua
   },

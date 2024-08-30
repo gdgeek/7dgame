@@ -36,9 +36,10 @@
           style="float: right; padding: 3px 0"
           type="text"
           class="font-text"
-          @click="goto('/web/example')"
         >
-          更多内容
+          <a target="_blank" href="https://space.bilibili.com/20959246">
+            更多内容
+          </a>
         </el-button>
       </div>
       <el-row :gutter="20">
@@ -94,7 +95,7 @@ import { videoPlayer } from 'vue-video-player'
 
 import '@/assets/font/font.css'
 export default {
-  name: 'Giant',
+  name: 'Cards',
   components: {
     videoPlayer
   },

@@ -2,6 +2,7 @@ import Type from './type'
 import Blockly from 'blockly'
 
 import ActionTrigger from './action_trigger'
+import ActionExecute from './action_execute'
 import DestroyTrigger from './destroy_trigger'
 import InitTrigger from './init_trigger'
 import UpdateTrigger from './update_trigger'
@@ -14,7 +15,8 @@ const TriggerCategory = {
     ActionTrigger.toolbox,
     DestroyTrigger.toolbox,
     InitTrigger.toolbox,
-    UpdateTrigger.toolbox
+    UpdateTrigger.toolbox,
+    ActionExecute.toolbox
   ]
 }
 
@@ -27,5 +29,6 @@ function TriggerRegister(parameters) {
   RegisterData(DestroyTrigger, parameters)
   RegisterData(InitTrigger, parameters)
   RegisterData(UpdateTrigger, parameters)
+  RegisterData(ActionExecute, parameters)
 }
 export { TriggerCategory, TriggerRegister }

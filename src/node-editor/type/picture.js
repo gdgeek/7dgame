@@ -28,7 +28,7 @@ var PictureType = {
 
     {
       type: 'resource',
-      key: 'picture',
+      key: 'resource',
       resource: 'picture',
       title: '图片',
       readonly: false

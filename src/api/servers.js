@@ -21,7 +21,6 @@ export function logout() {
   })
 }
 export function sts(bucket, region) {
-  //alert(2)
   const url = path.join(
     'servers',
     'sts' + qs.stringify({ bucket, region }, true)

@@ -4,7 +4,7 @@
     <el-row :gutter="30">
       <!-- content部分 -->
       <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12" align="center">
-        <div class="title-box" align="left">
+        <div class="title-box content-color" align="left">
           <div class="medical-title-h3 p-title-m">定制开发实景AR展馆体验</div>
 
           <p class="medical-content-small p-title-ss">
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+import '@/assets/font/font.css'
 // import SimpleVideo from '@/components/WebPublick/SimpleVideo.vue'
 export default {
   name: 'ExhibitionVideo',
@@ -98,13 +99,12 @@ export default {
   width: 100%;
 }
 .medical-title-h3 {
+  padding-bottom: 10px;
   font-size: 32px;
   font-weight: 400;
-  color: #222222;
 }
 .medical-title-small {
   color: #5a5a5b;
-  // color: #929292;
   font-weight: lighter;
   padding: 10px 0 10px;
   font-size: 16px;

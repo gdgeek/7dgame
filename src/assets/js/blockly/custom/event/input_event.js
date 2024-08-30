@@ -18,7 +18,7 @@ const block = {
           type: 'field_dropdown',
           name: 'Event',
           options: function () {
-            const input = resource.input
+            const input = resource.events.inputs
             let opt = [['none', '']]
             input.forEach(({ title, uuid }) => {
               opt.push([title, uuid])
@@ -57,14 +57,14 @@ const block = {
       var code = '..'
 
       var code =
-        "meta['#" +
-        dropdown_option +
-        "'] = function(parameter) \n\
+        "meta['#" + dropdown_option + "'] = function(parameter) \n\
+  is_playing = true\n\
   print('" +
         dropdown_option +
         "')\n" +
         statements_content +
-        'end\n'
+        '  is_playing = false\n\
+end\n'
 
       return code
     }
